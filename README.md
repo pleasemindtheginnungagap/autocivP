@@ -1,52 +1,58 @@
 # ♇ AutoCivP plus some goodies
 
+is mod for https://play0ad.com/download/
+
 Thanks to Nani ([most source is from Nani](https://github.com/nanihadesuka/autociv))
 
 Thanks to all the 0 A.D. players who found it useful.
 
 - General
-	- Help command: type /help matchWord to see all available commands. Also possible to use regEx searchpattern.
+ 	- Help command: type `/help <search>`,  type `/help` then <kbd>tab</kbd>  to see available commands. You can also use special search patterns called regular expressions, (or regEx for short, to search for commands).
 	- Jitsi commands: [type j<tab>](https://youtu.be/rofNXCZzLDM?si=DfYfVDqN5ahYy7WN&t=777) to create and send a jitsi-audioChat-link
 	- open links alias: type li<tab> to open a link.
  	- type <tab><tab> to see available commands that you have already used (history is saved into user.cfg).
 	- some other little commands that works like: type command<tab>
 
-- Wider Array of chat commands
-- Jitsi  (Voice Chat)
-	- it makes sure that all team members use the same jitsi-chat
-- map-profiles ( https://wildfiregames.com/forum/uploads/monthly_2023_07/Screenshot_20230725_150411.jpg.a954e52a74bb8dd0400c20e205933b61.jpg )
-- mod-profiles ( https://youtu.be/pt3VGm4N_Cw )
-  - restart automatically when mod-profiles has changed: https://www.youtube.com/watch?v=cDZc-m2_mCY
-  - and More...
-- prettyToggle - quick/easy during the game: Lower Graphics <-> Greater Graphics
-- communityModToggle - quick/easy not possible during the game
-- listIcons - command: use Symbols for some mod (not all are optional)
-- Auto-save Drafts in Chat: Never Lose Your Message Again! when you use hotkey for toggle beetween allies-room to all-room content or back. This feature ensures that the content of a chat message is not lost if it has not been sent yet. Instead, the content is saved and can be retrieved even if the user navigates away from the chat screen before sending the message. This can be useful to prevent users from losing their work in progress.
-- setup all defaults by type into the chat:
- feature value
-- Tab-Commands (easy to find by very good fuzzy-search):
-  - TogglComunityMod - Command ( https://youtu.be/pt3VGm4N_Cw?si=KHH670bJdief61i6&t=465 )
-  - food/... please ( https://youtu.be/rofNXCZzLDM?si=ijxsv4hfKQNuUFyQ&t=353 )
-- and More...
 
+	
 
-## Planned Features
+## Hands-Free & Accessibility Features
 
-- change the polar_sea time slices to other minues (e.g. from 15 to 5 Minutes)
-- maybe rename it this mod to ProCommandLine with Symbold ♇ (PLine)
-- maybe move it to gitlab
+This mod includes a suite of advanced accessibility features designed to enable fully hands-free, vocal-control gameplay (integrated with [SL5 Aura](https://github.com/sl5net/SL5-aura-service)). These additions solve major real-time strategy (RTS) accessibility barriers, such as precise mouse coordinate navigation, target-clicking, and camera panning.
 
-## Limitations
+These features run natively on the user-interface (GUI) side, ensuring complete stability and compatibility with other interface modifications.
 
-There is a limitation in the game where replays are not saved when you are the host of a team or 1v1 game. However, replays are saved when you join and play 1v1 games or team games.
+### Key Features
 
-but no problem if you use from the newer releases :
+#### 1. Single-Key Town Alert Toggle (Vocal Command: "Alarm / Entwarnung")
+* **Key:** `ö` (keysym `246`)
+* **How it works:** Instead of forcing the player to manually select a Civil Centre and click the "Raise Alert" button, pressing this hotkey instantly toggles the alert state across all own Civil Centres on the map. The player's active unit selection remains completely unaffected.
 
-...noMpJS... .zip
+#### 2. Multi-Tap Resource Gathering (Vocal Command: "Holz / Beeren / Fleisch")
+* **Key:** `+` (keysym `43` - customizable)
+* **How it works:** This feature implements a multi-tap (click-counting) system on a single hotkey to assign selected gatherers to the nearest resources without using a mouse. When selected workers are active:
+  * **1x Tap:** Finds the nearest tree within 150m and commands them to gather **Wood**.
+  * **2x Taps:** Finds the nearest fruit bush within 150m and commands them to gather **Fruit/Berries**.
+  * **3x Taps:** Finds the nearest wild animal within 150m and commands them to hunt **Meat**.
 
-## Questions & feedback
-For more information, questions and feedback, visit the thread on the [0 A.D. forum](https://wildfiregames.com/forum/topic/107371-autociv-add-ons-profiles-jitsi-team-call).
-Best place for post issues here: https://github.com/sl5net/autocivP/issues/
+#### 3. Relative Directional Unit Navigation (Vocal Command: "North / South / East / West / ...")
+* **Keys:** Numpad `1` to `9` (keysyms `1073741913` to `1073741921`)
+* **How it works:** Moves selected units in 100-meter steps relative to their current average position in any of the 8 compass directions. It uses a mathematical diagonal-offset scaling (0.707) to ensure uniform step sizes in all directions. No screen coordinates or clicks are required.
+
+#### 4. Screen-Space Relative Camera Navigation (Vocal Command: "Camera North / ...")
+* **Keys:** `Alt` (keysym `1073742050`) + Arrow Keys
+* **How it works:** Moves the camera in large 100-meter jumps. It calculates the camera's ground focal point via `Engine.GetCameraPivot()` and its rotation yaw via `Engine.GetCameraRotation()`. By applying a 2D rotation matrix with an inverted yaw angle, arrow key panning directions remain perfectly aligned with screen-space (e.g., pressing Up always pans the camera straight up), regardless of the camera's current rotation angle.
+
+---
+
+### Voice Control & SL5 Aura Integration
+
+These shortcuts are mapped to be seamlessly controlled via spoken commands using the SL5 Aura vocal service. You can find the corresponding open-source configurations and voice plugins Examples here:
+
+* [0 A.D. SL5 Aura Configuration](https://github.com/sl5net/SL5-aura-service/tree/master/config/maps/plugins/game/0ad)
+* [0 A.D. (Secondary Layout) SL5 Aura Configuration](https://github.com/sl5net/SL5-aura-service/tree/master/config/maps/plugins/game/0ad2)
+
+	
 
 # autoCivP and AutoCiv
 ## autoCivP
@@ -90,13 +96,14 @@ This mod is an aggregation of features meant to enhance the 0 A.D. game experien
 	- Remember playerlist state
 	- Better performance when reloading lobby
 	- Shortcuts to create host, navigate gamelist
-	- Write s?search_text_here at the chat input to search lobby chat
+	- Write `s?search_text_here` at the chat input to search lobby chat (dont enter just type). e.g. `s?anna|bob` shows all entries contains anna or bob
 - Game setup
-	- Auto-assign civilization with chat (only works if host has the mod)
+        - Auto-assign civilization with chat (Only works if host has the mod). To temporarily disable case-insensitive auto-completion and have more precise control over civilization assignment, use an uppercase letter.
+  	- List predefined game configurations: use `/help` or `/help`  with search patterns to find game configurations. For example: `/help /p\n+`
 	- Custom population limit
 	- Custom starting resources
 	- Custom map size
-	- Countdown to start the game
+	- Countdown to start the game ( also see `moddata/countdown_messages.txt` )
 - Maps
 	- Skirmish:
 		- Volcano island (8)
@@ -129,6 +136,9 @@ This mod is an aggregation of features meant to enhance the 0 A.D. game experien
 since 0ad A24 (was in other mod) intuitive hotkey feature are developed
 
 #### you can't remember the hotkeys?
+
+You can use single letters to build.
+
 try this:
 
 FirstLetter of the Building (press several times for toggling)
@@ -248,6 +258,11 @@ and taka a long in your user.cfg
 | Ctrl + A             | select Arsenal, ArmyCamp, Assembly, AmphitheaterPompeii, Apadana, Arch     |                |
 | Ctrl + D             | select Dock, Defense_tower , Dog     |                |
 | Ctrl + L             | select Library     |                |
+
+### select Actors
+
+| intuitive hotkeys    | Action               | non intuitive hotkeys |
+| :------------------- | :------------------- | :------------------- |
 | Alt + W              | select woman         | Alt + A                |
 | Alt + I              | select infantry      |                      |
 | Alt + P              | select Pikeman, Spearman, Fanatic |                |
@@ -293,7 +308,7 @@ and taka a long in your user.cfg
 
 ## Mod autociv compatibility(s)
 The mod is compatible with:
-- 0 A.D 0.0.26 and 0 A.D 0.0.27
+- 0 A.D 0.0.28
 - Should work with all mods that don't have extensive code changes
 
 ## Questions & feedback

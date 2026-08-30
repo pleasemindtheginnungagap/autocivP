@@ -1,3 +1,8 @@
+// Engine.IncludeScript("gui/common/functions_utility~autociv.js"); // Error: is not a function
+// const functionsUtility = require("gui/common/functions_utility~autociv.js"); // Error: is not defined
+
+
+
 var g_linkLongTeam = null; // init should be available during the game and not changed
 
 var g_lastCommand = "";
@@ -125,7 +130,7 @@ const g_autoCompleteText_newMerge = (guiObject, list) => {
 
 
   if(bugIt)
-    selfMessage(`129: ${caption.toLowerCase()} = ${caption}      gui/common/functions_utility~autociv.js`) //TODO - add to json tab-commands
+    selfMessage(`133: ${caption.toLowerCase()} = ${caption}      gui/common/functions_utility~autociv.js`) //TODO - add to json tab-commands
 
 
   // End of caption is maybe not empty
@@ -155,14 +160,39 @@ const g_autoCompleteText_newMerge = (guiObject, list) => {
       g_chat_draft = ''
       // g_chatTextInInputFild_when_msgCommand_lines = 0
       g_previousCaption = guiObject.caption
+
+      if(bugIt)
+        selfMessage(`165: return ||| caption = ${caption}  gui/common/functions_utility~autociv.js`)
+
+
       return
     }
 
-    if(setCaption2LastCommandOfHistory(guiObject)){
+    if(guiObject.caption == " " && setCaption2LastCommandOfHistory(guiObject)){
       g_previousCaption = guiObject.caption
+
+      /*
+      now chat expand is better.
+      ' '+<tab> shows the last command in the history
+      <tab> again emptys the chat when it could not find a command that starts with your input
+      */
+
+
+    // a single space plus <tab> schould allowed trigger this.  25-0211_0224-52
+    // sometimes old from history get in lobby, when you type beside. in a other editor. not in 0ad 25-0211_0224-52
+    //     return false // thre its better to ignore this. when you are in lobby
+    // warn(`1170: the toggle throw last commands in the history. is now limited to  if(caption == " "`)
+
+      if(bugIt)
+        selfMessage(`175: ${caption.toLowerCase()} = ${caption}      gui/common/functions_utility~autociv.js`) //TODO - add to json tab-commands
+
       return // now the caption is not empty anymore
     }
-  }
+  } // end of caption not empty
+
+  if(bugIt)
+    selfMessage(`282: caption = ${caption}  gui/common/functions_utility~autociv.js`)
+
 
  if( inputCopySearchReults(guiObject) )
   return
@@ -170,14 +200,59 @@ const g_autoCompleteText_newMerge = (guiObject, list) => {
 //   selfMessage(`171:  '${g_lastCommand}' `);
 
 
-  if(caption?.length ){
-
     // if(g_previousCaption == 'communityModToggle'
     //   || g_previousCaption == 'mainlandTwilightToggle'){
     //   if(bugIt)
     //     selfMessage(`178: now now now   gui/common/functions_utility~autociv.js `);
     //     captionCheck_is_communityModToggle_OR_mainlandTwilightToggle_optional_restartOad(caption, true)
     // }
+
+  if(caption?.length ){
+
+    // if(caption == "help"){
+    //   // selfMessage(`213: caption = ${caption}  gui/common/functions_utility~autociv.js`)
+    //   // transGGWP_markedStrings_I('allicons', []) // works a bit ugly
+    //   // translGGWP_splitInWords_II('allicons', []) // works a bit ugly
+    //   translGGWP_U2Gg_III('allicons', [], true)
+    //   // function translGGWP_U2Gg_III(gg, minMatchScore, reduceAmount = false) {
+    //   return
+    // }
+
+    const match = caption.match(/^help(\d*)$/); // Use a regular expression
+    if (match) {
+      let pageNumber = 1; // Default to page 1
+      if(match[1]){
+        pageNumber = match[1]; // Extract the captured group (the number)
+      }
+
+      const helpPageSize = 20; // Number of items per page
+
+      const startIndex = (pageNumber - 1) * helpPageSize; // Calculate the start index
+      const endIndex = startIndex + helpPageSize; // Calculate the end index
+
+
+      selfMessage(`=======================`)
+      selfMessage(`====== page ${pageNumber} ======`)
+      translGGWP_U2Gg_III('allicons', [], true, startIndex, endIndex);
+      // Update the caption to point to the next page (or loop back)
+      const nextPageNumber = (pageNumber % 5) + 1;
+      guiObject.caption = "help" + nextPageNumber;
+      return;
+  }
+
+    if(caption == "prettyEnable")
+    {
+      warn(`188: caption = ${caption}  gui/common/functions_utility~autociv.js`)
+      prettyGraphicsEnable()
+      saveLastCommand2History(caption)
+      return
+    }else {if(caption == "prettyDisable")
+    {
+      warn(`194: caption = ${caption}  gui/common/functions_utility~autociv.js`)
+      prettyGraphicsDisable()
+      saveLastCommand2History(caption)
+      return
+    }}
 
     if(captionCheck_is_prettyToggle(caption, true))
     {
@@ -187,7 +262,8 @@ const g_autoCompleteText_newMerge = (guiObject, list) => {
     }
 
 
-
+if(bugIt)
+  selfMessage(`222: caption = ${caption}  gui/common/functions_utility~autociv.js`)
 
     if(captionCheck_is_communityModToggle_OR_mainlandTwilightToggle_optional_restartOad(caption, true)){
       if(bugIt)
@@ -198,7 +274,11 @@ const g_autoCompleteText_newMerge = (guiObject, list) => {
       return
     }
 
-    if(g_chatTextInInputFild_when_msgCommand.length > 0){
+    bugIt = false &&  g_selfNick.includes("seeh") // new implementation so i will watch longer
+if(bugIt)
+  selfMessage(`234: caption = ${caption}  gui/common/functions_utility~autociv.js`)
+
+    if(caption.length > 0){
       // if (caption.toLowerCase() == 'msgall') {
 
 
@@ -211,6 +291,9 @@ const g_autoCompleteText_newMerge = (guiObject, list) => {
       //   return
       // }
       // Example use: msg2es
+      if(bugIt)
+        selfMessage(`295: gameState = ${gameState}`)
+
       const match = caption.toLowerCase().match(/msg(\d+|all)([a-z]{2})?([a-z]{2})?/);
       if (match) {
         saveLastCommand2History(caption)
@@ -218,8 +301,9 @@ const g_autoCompleteText_newMerge = (guiObject, list) => {
         let sourceLanguage = 'en'
         let targetLanguage = null
 
-        // selfMessage(`211: gameState = ${gameState}`)
-        // return
+        if(bugIt)
+          selfMessage(`305: number = ${number}`)
+          // return
 
         if(match[3]){
           sourceLanguage = match[2]
@@ -236,7 +320,16 @@ const g_autoCompleteText_newMerge = (guiObject, list) => {
         const lastLines = number == 'all' ? linesArray : linesArray.slice(-number);
         const lastLinesString = lastLines.join('\n');
 
+if(bugIt)
+  selfMessage(`315: lastLinesString = ${lastLinesString} , linesArray.length = ${linesArray.length}  `)
+
+if(bugIt)
+  selfMessage(`327: stringify=>>${JSON.stringify(linesArray)}<< , linesArray.length = ${linesArray.length}  `)
+
+
         if(!sendChatTranslated(guiObject, lastLinesString, sourceLanguage, targetLanguage)){
+          if(bugIt)
+            selfMessage(`328: lastLinesString = ${lastLinesString} , linesArray.length = ${linesArray.length}  `)
           guiObject.caption = lastLinesString
           g_previousCaption = guiObject.caption
           guiObject.buffer_position = 0 //  lastLinesString.length;
@@ -263,7 +356,13 @@ const g_autoCompleteText_newMerge = (guiObject, list) => {
       case 'whatsCommunityMod'.toLowerCase():
           guiObject.caption = whatsCommunityMod;
           return;
-      case 'legend'.toLowerCase():
+          case 'whatsReplay_pallas'.toLowerCase():
+            guiObject.caption = whatsReplay_pallas;
+            return;
+          case 'whatsModernGUIA27'.toLowerCase():
+            guiObject.caption = whatsModernGUIA27;
+            return;
+          case 'legend'.toLowerCase():
           guiObject.caption = `legend: ♤ proGUI mod, ♇ autocivP mod`
           return;
       case '/legend'.toLowerCase():
@@ -289,7 +388,21 @@ const g_autoCompleteText_newMerge = (guiObject, list) => {
         g_NetworkCommands['/whatstimeNow'] is not a function
         */
         try {
-          return g_NetworkCommands["/whatstimeNow"]()
+          // return g_NetworkCommands["/whatstimeNow"]() // is not a function
+
+
+          const today = new Date();
+          const hours = today.getHours().toString().padStart(2, '0');
+          const minutes = today.getMinutes().toString().padStart(2, '0');
+          const text = `it's ${hours}:${minutes} here.`
+          const chatInput = Engine.TryGetGUIObjectByName("chatInput");
+
+          // chatInput.focus()
+          chatInput.caption = text;
+          chatInput.buffer_position = text.length
+
+
+
         } catch (error) {
           selfMessage('inside lobby whatstimeNow is not a function, at the moment. and there is no will to fix it at the moment ;) Motivate me. its not so very importand command. other stuff is fine.');
           if(g_selfNick =="seeh"){ //NOTE -  developers want to see the error in the console
@@ -374,7 +487,9 @@ const g_autoCompleteText_newMerge = (guiObject, list) => {
     if( is_transGGWP_needet( caption, firstChar, g_iconPrefix,guiObject) )  {
       const captionBegin = caption.toString()
       let captionTrimed = captionBegin.substring(g_iconPrefix.length)
-      const minMatchScore = (captionTrimed.length > 20) ? 0.8 : (g_iconPrefix.length ? 0.3 :  0.55 ) // user name will be replaced later. i want have .3 but some users dont be found so easy ... hmmm // user name will be replaced later. i want have .3 but some users dont be found so easy ... hmmm // user name will be replaced later. i want have .3 but some users dont be found so easy ... hmmm
+      const minMatchScore = (captionTrimed.length > 20) ? 0.8 : (g_iconPrefix.length ? 0.3 :  g_minMatchScore )
+      // const minMatchScore = (captionTrimed.length > 20) ? 0.8 : (g_iconPrefix.length ? 0.3 :  0.55 )
+      // user name will be replaced later. i want have .3 but some users dont be found so easy ... hmmm // user name will be replaced later. i want have .3 but some users dont be found so easy ... hmmm // user name will be replaced later. i want have .3 but some users dont be found so easy ... hmmm
 
       // selfMessage(`355: gameState '${gameState}' `);
       if(gameState == "ingame"){
@@ -397,10 +512,11 @@ const g_autoCompleteText_newMerge = (guiObject, list) => {
 
 
       try {
-        const guiObject = Engine.GetGUIObjectByName("chatInput");
+        const guiObject = Engine.TryGetGUIObjectByName("chatInput");
         // guiObject.blur(); // remove the focus from a GUI element.
         guiObject.focus();
-        // selfMessage('230: allIconsInText = ' + allIconsInText);
+        if(bugIt)
+          selfMessage('230: allIconsInText = ' + allIconsInText);
 
         if(captionBegin != allIconsInText){
           const isCaptionNumeric = (allIconsInText[0] >= '0' && allIconsInText[0] <= '9')
@@ -413,12 +529,19 @@ const g_autoCompleteText_newMerge = (guiObject, list) => {
             const pattern = /\d+ \w+ please/;
             const hasPattern = pattern.test(allIconsInText);
             if(hasPattern){
-              // selfMessage(`392: gameState '${gameState}' `);
+
+              if(bugIt)
+                selfMessage(`392: gameState '${gameState}' `);
               return
             }
           }
 
-          g_previousCaption = captionTrimed
+          if(guiObject.caption == allIconsInText){
+            if(bugIt)
+              selfMessage(`452: caption == allIconsInText`);
+          }else{
+            g_previousCaption = captionTrimed
+          }
           guiObject.caption = allIconsInText
 
           guiObject.buffer_position = isCaptionNumeric ? 2 : allIconsInText.length;
@@ -466,20 +589,45 @@ const g_autoCompleteText_newMerge = (guiObject, list) => {
     //   setCaption2nextCommandOfHistory(guiObject)
     // }
     if(g_previousCaption == caption ){ // || g_lastCommand == caption
-      // selfMessage(`445: doppelPosting? '${g_lastCommand}' `);
-      if(setCaption2nextCommandOfHistory(guiObject)){
 
-        g_previousCaption = guiObject.caption
+        // selfMessage(`445: doppelPosting? '${g_lastCommand}' `);
+        if(bugIt)
+        {
+            selfMessage(`505: dont found the command '${caption}' `);
+            selfMessage(`506: command before was command '${g_previousCaption}' `);
+        }
+        // whats about command msg1 msg2 msg3 ????
+        // tats in line 232
+
+
+
+      // double tab could maybe mean icons should be removed
+      // are nonalphabetic characters in the string?
+      const hasMoreThanAscii = /^[\u0000-\u007f]*$/.test(caption);
+      if(!hasMoreThanAscii){
+        if(bugIt)
+          selfMessage(`445: nonalphabetic characters found '${caption}' `);
+      }else{
+
+        if( caption.length < 10 ){ // be careful with this command. overwrite text that someone else was typing and was not very sort
+          if(setCaption2nextCommandOfHistory(guiObject)){
+            g_previousCaption = guiObject.caption
+            if(bugIt)
+              selfMessage(`507: g_previousCaption = ${g_previousCaption}`);
+          }
+
         // setCaption2nextCommandOfHistory(guiObject)
 
-        return
       }
-    }
+    } // end of if( caption.length < 10 )
+    return
+
+    } // end of if(g_lastCommand == caption)
 
   }
 
   // try test send flare. dont work
-  // let minimapPanel = Engine.GetGUIObjectByName("minimapPanel")
+  // let minimapPanel = Engine.TryGetGUIObjectByName("minimapPanel")
   // minimapPanel.children[2].focus();
   // let objName = 'flar'
   // selfMessage(`461: ${objName} = ${objName}`)
@@ -679,7 +827,7 @@ function ConfigDB_CreateAndSaveValueA26A27(user, key, value, isEmptyAvalueAllowe
     // ConfigDB_CreateAndSaveValue is not a function error in Version a26 but in a27 23-0605_1920-25
     if(!user || !key || ( !isEmptyAvalueAllowed && value.length <= 0 ) ){
         // error('23-0625_0609-52');
-        warn(`!user=${user} || !key=${key} || !value=${value}`)
+        // warn(`!user=${user} || !key=${key} || !value=${value} info: isEmptyAvalueAllowed=${isEmptyAvalueAllowed}`);
         return false;
     }
 
@@ -720,7 +868,7 @@ function saveThisModProfile(nr, autoLabelManually) {
     // warn("check if ModProfiles has changed")
 
     const modProfile_alwaysIn_Key = 'modProfile.alwaysIn'
-    const modProfile_alwaysIn_Default = ''
+    const modProfile_alwaysIn_Default = 'autocivp'
     const mo = Engine.ConfigDB_GetValue("user", modProfile_alwaysIn_Key );
     if(!mo)
       ConfigDB_CreateAndSaveValueA26A27("user", modProfile_alwaysIn_Key, modProfile_alwaysIn_Default)
@@ -780,8 +928,10 @@ function saveThisModProfile(nr, autoLabelManually) {
     }
   }
   function enableThisModProfile(nr) {
+    // Engine.ConfigDB_GetValue("user", "modProfile.p" + nr + "enabled") == "true"
     if (
-      Engine.ConfigDB_GetValue("user", "modProfile.p" + nr + "enabled") == "true"
+      Engine.ConfigDB_GetValue("user", "modProfile.activeProfile") == nr
+
     ) {
       const modsFromUserCfg_const = Engine.ConfigDB_GetValue(
         "user",
@@ -806,30 +956,19 @@ function saveThisModProfile(nr, autoLabelManually) {
 
         // function RestartEngine(): any;
 
-        warn(clean);
-        warn("is enabled next when 0ad is started.");
-        // warn(modsFromUserCfg_const);
-        // warn("_____________________");
-        // Engine.ConfigDB_WriteValueToFile(
-        //   "user",
-        //   "modProfile.restartNext",
-        //   "true",
-        //   "config/user.cfg"
-        // );
-
-
-        // const modsEnabled = Engine.GetEnabledMods();
-
-        ConfigDB_CreateAndSaveValueA26A27("user", "modProfile.backup",modsFromUserCfg_const)
 
 
         if( gameState == "ingame"){
           warn(`in games autoRestart is disabled`)
           ConfigDB_CreateAndSaveValueA26A27("user", "mod.enabledmods",clean)
         }else{
-          const clean_array = clean.split(/\s+/);
-          // BTW when you want resarte but mod not changed you need call this function twice
+          const clean_array = clean.trim().split(/\s+/);
+          ConfigDB_CreateAndSaveValueA26A27("user", 'mod.enabledmods',clean)
           Engine.SetModsAndRestartEngine(["mod",...clean_array])
+          Engine.SetModsAndRestartEngine(["mod",...Engine.GetEnabledMods()])
+
+          // BTW when you want resarte but mod not changed you need call this function twice
+          // Engine.SetModsAndRestartEngine(["mod",...clean_array])
           // Engine.SetModsAndRestartEngine(["mod",...Engine.GetEnabledMods()])
         // print('857: clean_array: ' + JSON.stringify(clean_array) )
         // print('858: modsEnabled: ' + JSON.stringify(modsEnabled) )
@@ -849,22 +988,14 @@ function saveThisModProfile(nr, autoLabelManually) {
   function check_modProfileSelector_settings() {
 
     const autoLabelManually = Engine.ConfigDB_GetValue("user", "modProfile.autoLabelManually") === "true";
+    const name = "modProfile.activeProfile" // modProfile.activeProfile
+    const activeProfileNr = Engine.ConfigDB_GetValue("user",name )
 
-    [...Array(6)].forEach((_, k0_5) => saveThisModProfile(k0_5, autoLabelManually));
-
-    for (let k0_5 = 0; k0_5 <= 5; k0_5++) {
-      const nameOfCheckBox = "modProfile.p" + k0_5 + "enabled";
-      if (Engine.ConfigDB_GetValue("user", nameOfCheckBox) === "true") {
-        if (enableThisModProfile(k0_5)) {
-          warn(`${k0_5} was enabled as your default mod-configuration.`);
-          ConfigDB_CreateAndSaveValueA26A27("user", nameOfCheckBox, "false");
-          // warn(`${k0_5} checkBox disabled (if enabled have conflict with the normal mod selector)`);
-          return true;
-        }
-        break;
-      }
+    if ( activeProfileNr > 0 && enableThisModProfile(activeProfileNr)) {
+      warn(`${activeProfileNr} was enabled as your default mod-configuration.`);
+      ConfigDB_CreateAndSaveValueA26A27("user", name, "false");
+      return true;
     }
-
     return false;
   }
 
@@ -885,6 +1016,8 @@ function saveThisModProfile(nr, autoLabelManually) {
 
 function addModProfileAlwaysInAlsoAddAutocivPatTheEnd(clean) {
   const modProfileAlwaysIn = Engine.ConfigDB_GetValue("user", 'modProfile.alwaysIn');
+
+
   const modProfileAlwaysInArray = modProfileAlwaysIn.split(/\s/);
 
   modProfileAlwaysInArray.forEach(value => {
@@ -893,7 +1026,7 @@ function addModProfileAlwaysInAlsoAddAutocivPatTheEnd(clean) {
     clean = clean.replaceAll(regex, "");
   });
 
-  if (!clean.lower().includes(' autocivp'))
+  if (!clean.toLowerCase().includes(' autocivp'))
     clean += ' autocivp';
 
   return clean.replace(/\bautocivP\b/ig, `${modProfileAlwaysIn} autocivp` );
@@ -914,7 +1047,7 @@ function caption2_spanish(guiObject){
 function captionIs_j(guiObject){
 
     // "Select chat addressee." "Everyone"=0 "Allies"=1 Enemies=2 Observers=3
-    const chatAddressBox = Engine.GetGUIObjectByName("chatAddressee"); // found this name in binaries/data/mods/public/gui/session/chat/chat_window.xml
+    const chatAddressBox = Engine.TryGetGUIObjectByName("chatAddressee"); // found this name in binaries/data/mods/public/gui/session/chat/chat_window.xml
 
   if(gameState != "ingame" || chatAddressBox.selected != 1){ // 1 is Allies
     let text = `to use jiti in you team: 1. open Ally-Chat 2. write j⟦Tab⟧ then enter. 3. write li⟦Tab⟧ or /link`
@@ -1088,6 +1221,9 @@ function is_transGGWP_needet(caption, firstChar, iconPrefix, guiObject) {
 
 function setCaption2LastCommandOfHistory(guiObject){
 
+    // if( gameState == "lobby" ) // sometimes old from history get in lobby, when you type beside. in a other editor. not in 0ad 25-0211_0224-52
+    //     return false // thre its better to ignore this. when you are in lobby
+
 
     let doDebug = false // debug session
     // doDebug = true // debug session
@@ -1219,40 +1355,198 @@ function captionCheck_is_prettyToggle(caption, doRestart0ad = false){
 }
 
 /**
- * Enables pretty graphics settings.
+ * Enables pretty graphics settings. Aims to maximize visual fidelity, potentially at the cost of performance.
+ * Contains a backup/restore mechanism for toggling.
+ * Includes intelligent handling of water effects dependencies.
+ * Includes sky visibility and upscaling technique.
  *
  * @return {void} No return value.
  */
+let prettyGraphicsBackup = {}; // Store backup for easy toggling.
+
 function prettyGraphicsEnable() {
-  // Code to enable pretty graphics settings
-  // E.g., increase texture quality, enable antialiasing, etc.
-  ConfigDB_CreateAndSaveValueA26A27("user", "antialiasing", "msaa8");
-  ConfigDB_CreateAndSaveValueA26A27("user", "fog", "true");
-  ConfigDB_CreateAndSaveValueA26A27("user", "max_actor_quality", "150");
-  ConfigDB_CreateAndSaveValueA26A27("user", "shadowpcf", "true");
-  ConfigDB_CreateAndSaveValueA26A27("user", "shadowquality", "1");
-  ConfigDB_CreateAndSaveValueA26A27("user", "shadows", "true");
-  ConfigDB_CreateAndSaveValueA26A27("user", "sharpness", "0.14656737446784973");
-  ConfigDB_CreateAndSaveValueA26A27("user", "textures.quality", "1");
+
+    // Check if a backup exists. If so, restore the settings instead of applying "pretty" defaults.
+    if (Object.keys(prettyGraphicsBackup).length > 0) {
+        restoreSettings();
+        return; // Exit after restoring, so we don't apply "pretty" defaults again.
+    }
+
+    backupSettings(); // Create a backup of the current settings.
+
+    // Antialiasing smooths jagged edges. MSAA8 provides a good balance between quality and performance.  HIGH IMPORTANCE for visual quality.
+    ConfigDB_CreateAndSaveValueA26A27("user", "antialiasing", "msaa8");
+
+    // Fog adds atmospheric depth. Can have a moderate performance impact, especially on large maps. MEDIUM IMPORTANCE.
+    ConfigDB_CreateAndSaveValueA26A27("user", "fog", "true");
+
+    // max_actor_quality controls the level of detail of units and other actors. Higher values look better but use more resources.  MEDIUM/HIGH IMPORTANCE, especially with many units on screen.  150 is quite high; consider if it needs to be this high.
+    ConfigDB_CreateAndSaveValueA26A27("user", "max_actor_quality", "150");
+
+    // shadowpcf enables Percentage Closer Filtering for shadows, making them softer and more realistic.  HIGH IMPORTANCE for visual quality.
+    ConfigDB_CreateAndSaveValueA26A27("user", "shadowpcf", "true");
+
+    // shadowquality controls the resolution of shadows. Higher values look better but are more expensive.  MEDIUM IMPORTANCE. 1 is a reasonable starting point.
+    ConfigDB_CreateAndSaveValueA26A27("user", "shadowquality", "1");
+
+    // shadows enables or disables shadows. Disabling this can significantly improve performance. HIGH IMPORTANCE for performance.
+    ConfigDB_CreateAndSaveValueA26A27("user", "shadows", "true");
+
+    // Sharpness adjusts the level of detail in the image. Subtle adjustments can improve clarity without significant performance impact. LOW IMPORTANCE.  The given value is within a reasonable range, but the ideal value is subjective.
+    ConfigDB_CreateAndSaveValueA26A27("user", "sharpness", "0.14656737446784973");
+
+    // textures.quality controls the resolution of textures. Higher values look better but require more VRAM.  HIGH IMPORTANCE for visual quality and VRAM usage. 1 is the highest setting.
+    ConfigDB_CreateAndSaveValueA26A27("user", "textures.quality", "1");
+
+    ConfigDB_CreateAndSaveValueA26A27("user", "textures.maxanisotropy", "16");
+
+    // Water effects: Enable base effects and fancy effects for visual fidelity
+    ConfigDB_CreateAndSaveValueA26A27("user", "watereffects", "true");
+    ConfigDB_CreateAndSaveValueA26A27("user", "waterfancyeffects", "true");
+
+    //Since waterreflection and waterrefraction only have effect when watereffects = true, we enable those too
+    ConfigDB_CreateAndSaveValueA26A27("user", "waterreflection", "true");
+    ConfigDB_CreateAndSaveValueA26A27("user", "waterrefraction", "true");
+
+    // Show sky: Enable sky rendering for visual appeal.  Can have a slight performance impact.
+    ConfigDB_CreateAndSaveValueA26A27("user", "showsky", "true");
+
+    // Upscaling: Use a higher-quality upscaling technique (e.g., bilinear) for better visuals.  May have a slight performance cost compared to pixelated.
+    ConfigDB_CreateAndSaveValueA26A27("user", "renderer.upscale.technique", "bilinear");
+
+    // materialmgr.quality  Likely controls overall material quality. HIGH IMPORTANCE.  Adjusted to a higher setting for better visuals
+    ConfigDB_CreateAndSaveValueA26A27("user", "materialmgr.quality", "1.213517665863037");
+
 }
 
 /**
- * Disables pretty graphics settings.
+ * Disables pretty graphics settings. Aims to maximize performance, potentially at the cost of visual fidelity.
+ * Contains a backup/restore mechanism for toggling.
+ * Includes intelligent handling of water effects dependencies.
+ * Includes sky visibility and upscaling technique.
  *
  * @return {undefined} No return value.
  */
 function prettyGraphicsDisable() {
-  // Code to disable pretty graphics settings
-  // E.g., decrease texture quality, disable antialiasing, etc.
-  ConfigDB_CreateAndSaveValueA26A27("user", "fog", "false");
-  ConfigDB_CreateAndSaveValueA26A27("user", "max_actor_quality", "100");
-  ConfigDB_CreateAndSaveValueA26A27("user", "shadowpcf", "false");
-  ConfigDB_CreateAndSaveValueA26A27("user", "shadowquality", "-1");
-  ConfigDB_CreateAndSaveValueA26A27("user", "shadows", "false");
-  ConfigDB_CreateAndSaveValueA26A27("user", "sharpness", "0.09461931884288788");
-  ConfigDB_CreateAndSaveValueA26A27("user", "textures.quality", "0");
+    // Check if a backup exists. If so, restore the settings instead of applying "pretty" defaults.
+    if (Object.keys(prettyGraphicsBackup).length > 0) {
+        restoreSettings();
+        return; // Exit after restoring, so we don't apply "pretty" defaults again.
+    }
+
+
+    backupSettings(); // Create a backup of the current settings.
+
+    if(prettyGraphicsBackup["graphics.corpses.max"] > 50){
+      ConfigDB_CreateAndSaveValueA26A27("user", "autociv.session.graphics.corpses.max", "50");
+    }
+
+    // Antialiasing disabled improves performance. HIGH IMPORTANCE for performance.
+    ConfigDB_CreateAndSaveValueA26A27("user", "antialiasing", "disabled");
+
+    // Fog adds atmospheric depth. Can have a moderate performance impact, especially on large maps. MEDIUM IMPORTANCE. Disabling it could increase performance.
+    ConfigDB_CreateAndSaveValueA26A27("user", "fog", "false");
+
+    // max_actor_quality controls the level of detail of units and other actors. Lowering it significantly improves performance, especially with many units on screen. MEDIUM/HIGH IMPORTANCE. 100 is a reasonable low setting.
+    ConfigDB_CreateAndSaveValueA26A27("user", "max_actor_quality", "100");
+
+    // shadowpcf enables Percentage Closer Filtering for shadows. HIGH IMPORTANCE for visual quality.  Disabling it improves performance.
+    ConfigDB_CreateAndSaveValueA26A27("user", "shadowpcf", "false");
+
+    // shadowquality controls the resolution of shadows. Lower values improve performance. MEDIUM IMPORTANCE. Setting to -1 likely disables shadows.
+    ConfigDB_CreateAndSaveValueA26A27("user", "shadowquality", "-1");
+
+    // shadows enables or disables shadows. Disabling this can significantly improve performance. HIGH IMPORTANCE for performance.
+    ConfigDB_CreateAndSaveValueA26A27("user", "shadows", "false");
+
+    // Sharpness adjusts the level of detail in the image. LOW IMPORTANCE.  The given value is within a reasonable range, but the ideal value is subjective.
+    ConfigDB_CreateAndSaveValueA26A27("user", "sharpness", "0.09461931884288788");
+
+    // textures.quality controls the resolution of textures. Lower values improve performance. HIGH IMPORTANCE. 0 is the lowest setting.
+    ConfigDB_CreateAndSaveValueA26A27("user", "textures.quality", "0");
+
+    ConfigDB_CreateAndSaveValueA26A27("user", "textures.maxanisotropy", "1");
+
+    // Water effects: Disable all water effects for maximum performance
+    ConfigDB_CreateAndSaveValueA26A27("user", "watereffects", "false");
+    ConfigDB_CreateAndSaveValueA26A27("user", "waterfancyeffects", "false");
+
+    //Waterreflection and waterrefraction depend on watereffects, so we disable those too.
+    ConfigDB_CreateAndSaveValueA26A27("user", "waterreflection", "false");
+    ConfigDB_CreateAndSaveValueA26A27("user", "waterrefraction", "false");
+
+    // Show sky: Disable sky rendering for increased performance.
+    ConfigDB_CreateAndSaveValueA26A27("user", "showsky", "false");
+
+    // Upscaling: Use a pixelated upscaling technique for maximum performance.
+    ConfigDB_CreateAndSaveValueA26A27("user", "renderer.upscale.technique", "pixelated");
+
+    // materialmgr.quality  Likely controls overall material quality. HIGH IMPORTANCE.  Set to a lower setting for better performance
+        ConfigDB_CreateAndSaveValueA26A27("user", "materialmgr.quality", "1.0"); // Or find a value that is lower.
+
 }
 
+/**
+ * Backs up the current graphics settings to the `prettyGraphicsBackup` object.
+ *
+ * @return {void}
+ */
+function backupSettings() {
+  prettyGraphicsBackup = {
+    "graphics.corpses.max": Engine.ConfigDB_GetValue("user", "autociv.session.graphics.corpses.max"),
+
+    "antialiasing": Engine.ConfigDB_GetValue("user", "antialiasing"),
+      "fog": Engine.ConfigDB_GetValue("user", "fog"),
+      "max_actor_quality": Engine.ConfigDB_GetValue("user", "max_actor_quality"),
+      "shadowpcf": Engine.ConfigDB_GetValue("user", "shadowpcf"),
+      "shadowquality": Engine.ConfigDB_GetValue("user", "shadowquality"),
+      "shadows": Engine.ConfigDB_GetValue("user", "shadows"),
+      "sharpness": Engine.ConfigDB_GetValue("user", "sharpness"),
+      "textures.quality": Engine.ConfigDB_GetValue("user", "textures.quality"),
+      "textures.maxanisotropy": Engine.ConfigDB_GetValue("user", "textures.maxanisotropy"),
+      "watereffects": Engine.ConfigDB_GetValue("user", "watereffects"),
+      "waterfancyeffects": Engine.ConfigDB_GetValue("user", "waterfancyeffects"),
+      "waterreflection": Engine.ConfigDB_GetValue("user", "waterreflection"),
+      "waterrefraction": Engine.ConfigDB_GetValue("user", "waterrefraction"),
+      "showsky": Engine.ConfigDB_GetValue("user", "showsky"),
+      "renderer.upscale.technique": Engine.ConfigDB_GetValue("user", "renderer.upscale.technique"),
+      "materialmgr.quality": Engine.ConfigDB_GetValue("user", "materialmgr.quality")
+  };
+}
+
+/**
+ * Restores the graphics settings from the `prettyGraphicsBackup` object.
+ * Clears backup after restore.
+ *
+ * @return {void}
+ */
+function restoreSettings() {
+    if (Object.keys(prettyGraphicsBackup).length === 0) {
+        return; // No backup to restore.
+    }
+
+    ConfigDB_CreateAndSaveValueA26A27("user", "autociv.session.graphics.corpses.max", prettyGraphicsBackup["graphics.corpses.max"]);
+
+
+    ConfigDB_CreateAndSaveValueA26A27("user", "antialiasing", prettyGraphicsBackup["antialiasing"]);
+    ConfigDB_CreateAndSaveValueA26A27("user", "fog", prettyGraphicsBackup["fog"]);
+    ConfigDB_CreateAndSaveValueA26A27("user", "max_actor_quality", prettyGraphicsBackup["max_actor_quality"]);
+    ConfigDB_CreateAndSaveValueA26A27("user", "shadowpcf", prettyGraphicsBackup["shadowpcf"]);
+    ConfigDB_CreateAndSaveValueA26A27("user", "shadowquality", prettyGraphicsBackup["shadowquality"]);
+    ConfigDB_CreateAndSaveValueA26A27("user", "shadows", prettyGraphicsBackup["shadows"]);
+    ConfigDB_CreateAndSaveValueA26A27("user", "sharpness", prettyGraphicsBackup["sharpness"]);
+    ConfigDB_CreateAndSaveValueA26A27("user", "textures.quality", prettyGraphicsBackup["textures.quality"]);
+    ConfigDB_CreateAndSaveValueA26A27("user", "textures.maxanisotropy", prettyGraphicsBackup["textures.maxanisotropy"]);
+    ConfigDB_CreateAndSaveValueA26A27("user", "watereffects", prettyGraphicsBackup["watereffects"]);
+    ConfigDB_CreateAndSaveValueA26A27("user", "waterfancyeffects", prettyGraphicsBackup["waterfancyeffects"]);
+    ConfigDB_CreateAndSaveValueA26A27("user", "waterreflection", prettyGraphicsBackup["waterreflection"]);
+    ConfigDB_CreateAndSaveValueA26A27("user", "waterrefraction", prettyGraphicsBackup["waterrefraction"]);
+    ConfigDB_CreateAndSaveValueA26A27("user", "showsky", prettyGraphicsBackup["showsky"]);
+    ConfigDB_CreateAndSaveValueA26A27("user", "renderer.upscale.technique", prettyGraphicsBackup["renderer.upscale.technique"]);
+    ConfigDB_CreateAndSaveValueA26A27("user", "materialmgr.quality", prettyGraphicsBackup["materialmgr.quality"]);
+
+    prettyGraphicsBackup = {}; // Clear the backup after restoring.
+}
 
 
 /**
@@ -1265,8 +1559,12 @@ function prettyGraphicsDisable() {
  *                   doRestart0ad is false. Otherwise, returns false.
  */
 function captionCheck_is_communityModToggle_OR_mainlandTwilightToggle_optional_restartOad(caption, doRestart0ad = false){
-  if(caption.trim() == "communityModToggle"
-  || caption.trim() == "mainlandTwilightToggle"){
+  const captiontrim = caption.trim()
+  if(captiontrim == "communityModToggle"
+  || captiontrim == "mainlandTwilightToggle"
+  || captiontrim == "kateModToggle"
+  || captiontrim == "kateToggle"
+){
 
 
     if(gameState == "ingame"){
@@ -1284,24 +1582,34 @@ function captionCheck_is_communityModToggle_OR_mainlandTwilightToggle_optional_r
     );
     selfMessage(`enabledmods = ${enabledmods}`);
 
-    if(caption.trim() == "mainlandTwilightToggle"){
+    if(captiontrim == "mainlandTwilightToggle"){
       if(enabledmods.indexOf("mainland-twilight") == -1)
         enabledmods += ' mainland-twilight'
       else
         enabledmods = enabledmods.replace(/\s*\bmainland-twilight\b\s*/, " ")
     }
-    else{
+
+    if(captiontrim == "communityModToggle"){
       if(enabledmods.indexOf("community-mod") == -1)
         enabledmods += ' community-mod'
       else
         enabledmods = enabledmods.replace(/\s*\bcommunity-mod\b\s*/, " ")
     }
+
+    if(captiontrim == "kateModToggle" || captiontrim == "kateToggle"){
+      if(enabledmods.indexOf("kate ") == -1)
+        enabledmods += ' kate '
+      else
+        enabledmods = enabledmods.replace(/\s*\bkate\b\s*/, " ")
+    }
+
     ConfigDB_CreateAndSaveValueA26A27("user", "mod.enabledmods", enabledmods.trim())
     selfMessage(`enabledmods = ${enabledmods}`);
 
 
     const clean_array = enabledmods.trim().split(/\s+/);
     Engine.SetModsAndRestartEngine(["mod",...clean_array])
+    Engine.SetModsAndRestartEngine(["mod",...Engine.GetEnabledMods()])
   }
 }
 
@@ -1338,7 +1646,7 @@ function inputCopySearchReults(chatInput){
     return true
   }
 
-  let chatText = Engine.GetGUIObjectByName("chatText")
+  let chatText = Engine.TryGetGUIObjectByName("chatText")
   if(!chatText){
     // chatText = chatInput // has no list property ingame state
     chatInput.caption = g_chatTextInInputFild_when_msgCommand
@@ -1350,6 +1658,8 @@ function inputCopySearchReults(chatInput){
   chatText.list.filter(t => {
     chatStr += t.replace(/\[.*?\]/g, '');
   })
+
+
   chatInput.caption = chatStr
   return true
 }
@@ -1367,8 +1677,10 @@ function translateText(textToTranslate = 'Hello, how are you?', sourceLanguage =
 
 function sendChatTranslated(guiObject, text, sourceLanguage, targetLanguage) {
 
+  // bugIt = true &&  g_selfNick.includes("seeh") // new implementation so i will watch longer
   if(!targetLanguage){
-    error(`targetLanguage is empty.`)
+    // if(bugIt)
+    //   error(`targetLanguage is empty.`)
     return false
   }
 

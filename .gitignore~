@@ -1,0 +1,21 @@
+# Daten / Konfiguration
+# moddata/autociv_0ad_keys.txt
+moddata/autociv_0ad_default.cfg
+/release.json
+
+# Archive
+*.zip
+
+# Temporäre Dateien
+*tempList.text
+
+# IDE / Editor
+.vscode/
+error_unsolved.txt
+
+# Netlify
+.netlify/cache/
+
+# Ignoriere nur die Inhalte, nicht den Ordner selbst!
+.netlify/functions/*
+

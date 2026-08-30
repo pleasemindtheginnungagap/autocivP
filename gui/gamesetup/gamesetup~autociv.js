@@ -30,8 +30,8 @@ var g_autociv_hotkeys = {
 },
 	"autociv.gamesetup.focus.chatInput": function (ev)
 	{
-		Engine.GetGUIObjectByName("chatInput").blur();
-		Engine.GetGUIObjectByName("chatInput").focus();
+		Engine.TryGetGUIObjectByName("chatInput").blur();
+		Engine.TryGetGUIObjectByName("chatInput").focus();
 	},
 	/**
  	 * Can't unfocus chat input without mouse, use cancel hotkey to unfocus from it
@@ -40,7 +40,7 @@ var g_autociv_hotkeys = {
  	 */
 	"cancel": ev =>
 	{
-		const obj = Engine.GetGUIObjectByName("gameStateNotifications")
+		const obj = Engine.TryGetGUIObjectByName("gameStateNotifications")
 		obj?.blur()
 		obj?.focus()
 	}
@@ -68,8 +68,8 @@ function setDefaultsToOptionsPersonalizationWhenNewInstalled()
 
 autociv_patchApplyN("init", function (target, that, args)
 {
-	Engine.GetGUIObjectByName("chatText").buffer_zone = 2.01
-	Engine.GetGUIObjectByName("chatText").size = Object.assign(Engine.GetGUIObjectByName("chatText").size, {
+	Engine.TryGetGUIObjectByName("chatText").buffer_zone = 2.01
+	Engine.TryGetGUIObjectByName("chatText").size = Object.assign(Engine.TryGetGUIObjectByName("chatText").size, {
 		left: 4, top: 4, bottom: -32
 	})
 
@@ -89,12 +89,13 @@ autociv_patchApplyN("init", function (target, that, args)
 
 	g_autociv_countdown.init();
 
-	Engine.GetGUIObjectByName("chatInput").blur();
-	Engine.GetGUIObjectByName("chatInput").focus();
+	Engine.TryGetGUIObjectByName("chatInput").blur();
+	Engine.TryGetGUIObjectByName("chatInput").focus();
 
-
-
-    selfMessage(`83: gui/gamesetup/gamesetup~autociv.js`);
+	let bugIt = false
+	bugIt = bugIt && g_selfNick.includes("seeh") // new implementation so i will watch longer
+	if(bugIt)
+    	selfMessage(`83: gui/gamesetup/gamesetup~autociv.js`);
 
     // selfMessage(`game.is.rated(): ${game.is.rated()} 85`);
 
@@ -133,8 +134,9 @@ function warnModIsNotEnabled(){
 		key
 	);
 	if(!warnThisModIsNotEnabled){
-		warnThisModIsNotEnabled = 'feldmap'; // default it will warn
-		ConfigDB_CreateAndSaveValueA26A27("user", key, warnThisModIsNotEnabled);
+		// warnThisModIsNotEnabled = 'feldmap'; // default it will warn. e.g. feldmap
+		// ConfigDB_CreateAndSaveValueA26A27("user", key, warnThisModIsNotEnabled);
+		return false
 	}
 	if(warnThisModIsNotEnabled != 'false'){  // default it will warn
 		const enabledmods = Engine.ConfigDB_GetValue(
@@ -142,7 +144,7 @@ function warnModIsNotEnabled(){
 			"mod.enabledmods"
 		);
 		if(!(enabledmods.indexOf(warnThisModIsNotEnabled)>0)){
-			warn(`Really want play without ${warnThisModIsNotEnabled} mod ?`);
+			warn(`Really want play without '${warnThisModIsNotEnabled}' mod ?`);
 			// warn(`enabledmods: ${enabledmods} ?`);
 		}
 	}
@@ -246,9 +248,13 @@ function setCaption_when_JoinOrStart_Setup_suggestRestoreMods_when_modsChanged()
 			// i ♡ autocivP♇ mod
 
 			const popMax = g_GameSettings.population.cap
+			let newBufferPosition = 0
 
-			newCaptionString = `hi ${countPlayers > 2 ? 'all ': hostName + ' ' }(◕‿◕) BTW: popMax: ${popMax}` //  good luck with setup
-			const newBufferPosition = newCaptionString.length
+			if(hostName != g_selfNick){ // dont greet yourself
+				// needs more tested when is time and get priority 25-0128_1615-15
+				newCaptionString = `hi ${countPlayers > 2 ? 'all ': hostName + ' ' }(◕‿◕) BTW: popMax: ${popMax}` //  good luck with setup
+			}
+			newBufferPosition = newCaptionString.length
 
 			if(doHelloAutomaticSuggestionWhenJoinAgameSetup == 'PLine'){
 				const randomg_seeh_greet = g_PromotePLineWhenGreetInChatMessages[Math.floor(Math.random() * g_PromotePLineWhenGreetInChatMessages.length)]
@@ -261,7 +267,7 @@ function setCaption_when_JoinOrStart_Setup_suggestRestoreMods_when_modsChanged()
 			}
 
 
-			const chatInput = Engine.GetGUIObjectByName("chatInput")
+			const chatInput = Engine.TryGetGUIObjectByName("chatInput")
 			chatInput.caption = newCaptionString
 			chatInput.buffer_position = newBufferPosition
 
@@ -316,9 +322,20 @@ function setCaption_when_JoinOrStart_Setup_suggestRestoreMods_when_modsChanged()
 							}
 					}
 					// i ♡ autocivP♇ mod
-					newCaptionString = `hi ${countPlayers > 2 ? 'all ': hostName + '' }(◕‿◕) BTW popMax is ${popMax}` //  good luck with setup
-					const newBufferPosition = newCaptionString.length
 
+/*
+		const isRated = g_GameSettings.rated.isRated ? "Rated" : ""
+
+		const isTreasuresIn = g_GameSettings.disableTreasures.enabled  ? "Treasures" : "";
+		const isNomad = g_GameSettings.nomad.enabled ? "Nomad" : ""
+
+*/
+
+				if(hostName != g_selfNick){ // dont greet yourself
+					// needs more tested when is time and get priority 25-0128_1615-15
+					newCaptionString = `hi ${countPlayers > 2 ? 'all ': hostName + '' }(◕‿◕) BTW popMax is ${popMax}, ${isTreasuresIn}, ${isNomad}` //  good luck with setup
+					const newBufferPosition = newCaptionString.length
+				}
 
 					if(doHelloAutomaticSuggestionWhenJoinAgameSetup == 'PLine'){
 						// newCaptionString +=
@@ -331,7 +348,7 @@ function setCaption_when_JoinOrStart_Setup_suggestRestoreMods_when_modsChanged()
 						ConfigDB_CreateAndSaveValueA26A27("user", `AudioTTS.speak`, randomg_seeh_greet);
 					}
 
-					const chatInput = Engine.GetGUIObjectByName("chatInput")
+					const chatInput = Engine.TryGetGUIObjectByName("chatInput")
 					chatInput.caption = newCaptionString
 					chatInput.buffer_position = newBufferPosition
 					selfMessage(`you dont want see this message? \n Game > Settings > Options > Personalization > auto hello Suggestion = false`);
@@ -348,7 +365,7 @@ function setCaption_when_JoinOrStart_Setup_suggestRestoreMods_when_modsChanged()
 		warn(`newCaptionString: ${newCaptionString}`);
 
 	if(newCaptionString){
-		const chatInput = Engine.GetGUIObjectByName("chatInput")
+		const chatInput = Engine.TryGetGUIObjectByName("chatInput")
 		chatInput.caption = newCaptionString
 	}
 }

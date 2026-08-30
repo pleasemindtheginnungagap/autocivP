@@ -1,0 +1,8 @@
+[build]
+  functions = ".netlify/functions"
+  publish = "public"
+
+[[redirects]]
+  from = "/download/latest.zip"
+  to = "/.netlify/functions/latest-release"
+  status = 200

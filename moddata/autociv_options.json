@@ -146,7 +146,20 @@
 				"label": "[color=\"220 185 70\"]Global:[/color] Copy all chat messages",
 				"tooltip": "default is copy only the last message sent to you \n empty your chat and pres ⟦Tab⟧. \n get N mesages from your copy press msgN⟦Tab⟧ like msg1⟦Tab⟧ or msg3⟦Tab⟧.",
 				"config": "autocivP.chat.copyAllChatMessages"
+			},
+			{
+				"type": "dropdown",
+				"label": "[color=\"204 133 0\"]Lobby join Suggestion[/color]",
+				"tooltip": "Suggestion When you Join the lobby",
+				"config": "autocivP.lobby.InitialCaption",
+				"list": [
+					{ "value": "", "label": ""  },
+					{ "value": "/away", "label": "suggest to set /away (changes your status and color)"  },
+					{ "value": "s?→me", "label": "searches only messages using your name"  },
+					{ "value": "s?/away", "label": "funny :) easy to modify"  }
+				]
 			}
+
 
 		]
 	},
@@ -174,7 +187,7 @@
 			},
 			{
 				"type": "string",
-				"label": "",
+				"label": "use folder name. some sometimes it not like mod name!",
 				"tooltip": "all your mods that you want to enable \n (if want add new: Settings > Mod Selection\n  read: [color=\"255 0 0\"]mod.enabledmods[/color]).\n [color=\"255 0 0\"]",
 				"config": "modProfile.p1"
 			},
@@ -192,7 +205,7 @@
 			},
 			{
 				"type": "string",
-				"label": "",
+				"label": "use folder name. some sometimes it not like mod name!",
 				"tooltip": "all your mods that you want to enable \n (if want add new: Settings > Mod Selection\n  read: [color=\"255 0 0\"]mod.enabledmods[/color]).\n [color=\"255 0 0\"]",
 				"config": "modProfile.p2"
 			},
@@ -210,7 +223,7 @@
 			},
 			{
 				"type": "string",
-				"label": "",
+				"label": "use folder name. some sometimes it not like mod name!",
 				"tooltip": "all your mods that you want to enable \n (if want add new: Settings > Mod Selection\n  read: [color=\"255 0 0\"]mod.enabledmods[/color]).\n [color=\"255 0 0\"]",
 				"config": "modProfile.p3"
 			},
@@ -228,7 +241,7 @@
 			},
 			{
 				"type": "string",
-				"label": "",
+				"label": "use folder name. some sometimes it not like mod name!",
 				"tooltip": "all your mods that you want to enable \n (if want add new: Settings > Mod Selection\n  read: [color=\"255 0 0\"]mod.enabledmods[/color]).\n [color=\"255 0 0\"]",
 				"config": "modProfile.p4"
 			},
@@ -246,7 +259,7 @@
 			},
 			{
 				"type": "string",
-				"label": "",
+				"label": "use folder name. some sometimes it not like mod name!",
 				"tooltip": "all your mods that you want to enable \n (if want add new: Settings > Mod Selection\n  read: [color=\"255 0 0\"]mod.enabledmods[/color]).\n [color=\"255 0 0\"]",
 				"config": "modProfile.p5"
 			},

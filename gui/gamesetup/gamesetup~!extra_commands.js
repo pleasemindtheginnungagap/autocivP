@@ -1,9 +1,6 @@
 var g_linkLong = null; // init should be available during the game and not changed
 var g_gameMapMapPrevious = null; // help prefent/debugging a errors, at the moment
 
-// warn('Loaded gamesetup~!extra_commands.js'); // is not defined. but later it will be
-
-
 var game = {
   // stuff that needs to be updated after the gui updates it (as it removes it before it)
   // undefined will mean it doesnt exist
@@ -16,13 +13,13 @@ var game = {
     // but works. btw its possible to set it to  9. dont worry , but needet trick ! 23-0816_1351-04
     /*!SECTION todo: maybe find a more pretty solution then this trick, but seems work pretty well 23-0816_1351-04*/
     const playerCount_backup = g_GameSettings.playerCount.nbPlayers
-    if(playerCount_backup < 9){
+    if (playerCount_backup < 9) {
       const playerCount_newTemp = playerCount_backup + 1
       try {
         g_GameSettings.playerCount.nbPlayers = playerCount_newTemp
       } catch (error) {
-          // supresed error: g_Settings.PlayerDefaults[(playerIndex + 1)] is undefined
-          // its a trick to make it work. becouse the other player dont see the updates sometimes if i dont do this trick
+        // supresed error: g_Settings.PlayerDefaults[(playerIndex + 1)] is undefined
+        // its a trick to make it work. becouse the other player dont see the updates sometimes if i dont do this trick
       }
       g_GameSettings.playerCount.nbPlayers = playerCount_backup
     }
@@ -33,7 +30,7 @@ var game = {
   },
   get panels() {
 
-// setGameNameInLobby(text)
+    // setGameNameInLobby(text)
     return g_SetupWindow.pages.GameSetupPage.panels;
   },
   get panelsButtons() {
@@ -102,7 +99,7 @@ var game = {
         let bugIt = false // new implementation so i will watch longer
         // bugIt = true &&  g_selfNick.includes("seeh") // new implementation so i will watch longer
 
-        if(bugIt)
+        if (bugIt)
           selfMessage(`101: playerName = ${playerName}`)
 
         let playerPos = game.get.player.pos(playerName);
@@ -272,19 +269,35 @@ g_NetworkCommandsDescriptions = Object.assign(g_NetworkCommandsDescriptions, {
   "/banspecs": "Ban all specs",
   "/list": "List all the players and observers currently here",
   "/clear": "Clear the chat comments",
+
+  "/pWaterMainland()": " pWaterMainland()",
+
+
+
   "/pMainland_1v1_defaults": " for mainland, popMax, 300res, and more",
+
   "/p0_75popMax":
     "/super little game",
+
   "/p1v1Mainland_defaults":
     "/pNumber is alias to some proviles. e.g. /p1... to /pMainland_1v1... or /p4...",
+
   "/pMainland_2v2_defaults":
     "type pM⟦Tab⟧ for mainland, popMax, 300res, and more",
   "/pMBMainland_2v2_defaults":
     "type pMB⟦Tab⟧ to get mainland balanced popMax, 300res",
   "/pUnknown_defaults":
     "type pU⟦Tab⟧ for  map unknown, popMax, 300res, and more",
-  "/pExtinct_volcano_defaults":
-    "type pU⟦Tab⟧ for extinct_volcano and other defaults",
+
+  "/pSurvivalFittest":
+    "type pS⟦Tab⟧ for SurvivalFittest",
+
+  "/pVolcano_defaults":
+    "type pE⟦Tab⟧ for extinct_volcano",
+  "/pVolcano_Extrem":
+    "type pE⟦Tab⟧ for Volcano_Extrem",
+  "/pVolcano_ExtremExtrem":
+    "type pEE⟦Tab⟧ for Volcano_ExtremExtreme",
   "/pRestoreLastProfile":
     "/pRestoreLastProfile<enter> when you want restore last profile",
   "/iconsList":
@@ -305,7 +318,7 @@ g_NetworkCommands["/versionNr"] = (match) => { // if textAllSometing is somethin
 
   const version0ad = Engine.GetEngineInfo().mods[0].version
 
-  const chatInput = Engine.GetGUIObjectByName("chatInput")
+  const chatInput = Engine.TryGetGUIObjectByName("chatInput")
   chatInput.focus()
   chatInput.caption = `i use autocivP Version is ${g_autocivPVersion} in 0ad ${version0ad}`
 }
@@ -315,10 +328,10 @@ g_NetworkCommands["/iconsList"] = (match) => { // if textAllSometing is somethin
   const keys = transGGWP_markedStrings_I('alliconkeys')
   selfMessage(keys)
   selfMessage('List of Emojis and Symbols visible in 0ad: https://wildfiregames.com/forum/topic/107659-list-of-emojis-and-symbols-visible-in-0ad/')
-  const chatInput = Engine.GetGUIObjectByName("chatInput")
+  const chatInput = Engine.TryGetGUIObjectByName("chatInput")
   chatInput.focus()
   chatInput.caption = keys
-  // let label = Engine.GetGUIObjectByName("option_label[" + i + "]");
+  // let label = Engine.TryGetGUIObjectByName("option_label[" + i + "]");
   // label.caption = option.label;
   // label.tooltip = option.tooltip;
 }
@@ -328,10 +341,10 @@ g_NetworkCommands["/iconList"] = (match) => { // if textAllSometing is something
   const keys = transGGWP_markedStrings_I('alliconkeys')
   selfMessage(keys)
   selfMessage('List of Emojis and Symbols visible in 0ad: https://wildfiregames.com/forum/topic/107659-list-of-emojis-and-symbols-visible-in-0ad/')
-  const chatInput = Engine.GetGUIObjectByName("chatInput")
+  const chatInput = Engine.TryGetGUIObjectByName("chatInput")
   chatInput.focus()
   chatInput.caption = keys
-  // let label = Engine.GetGUIObjectByName("option_label[" + i + "]");
+  // let label = Engine.TryGetGUIObjectByName("option_label[" + i + "]");
   // label.caption = option.label;
   // label.tooltip = option.tooltip;
 }
@@ -341,10 +354,10 @@ g_NetworkCommands["/listIcons"] = (match) => { // if textAllSometing is somethin
   const keys = transGGWP_markedStrings_I('alliconkeys')
   selfMessage(keys)
   selfMessage('List of Emojis and Symbols visible in 0ad: https://wildfiregames.com/forum/topic/107659-list-of-emojis-and-symbols-visible-in-0ad/')
-  const chatInput = Engine.GetGUIObjectByName("chatInput")
+  const chatInput = Engine.TryGetGUIObjectByName("chatInput")
   chatInput.focus()
   chatInput.caption = keys
-  // let label = Engine.GetGUIObjectByName("option_label[" + i + "]");
+  // let label = Engine.TryGetGUIObjectByName("option_label[" + i + "]");
   // label.caption = option.label;
   // label.tooltip = option.tooltip;
 }
@@ -358,14 +371,14 @@ g_NetworkCommands["/help"] = (match, sendIt2AllForRead = false) => { // if textA
   const g_ChatCommandColor = "200 200 255";
   // importand to change the normal \ here! otherwise it wont work .
   const matchStrForReadInGame = match.replace('\\', "∖");
-    let text = translate(`Chat commands that match ${matchStrForReadInGame} if its there:`);
+  let text = translate(`Chat commands that match ${matchStrForReadInGame} if its there:`);
   let isSomethingFound = false;
   for (let command in g_NetworkCommands) {
-    if(!command)continue; // idk if it helps to get it more stable 23-0624_1401-28
+    if (!command) continue; // idk if it helps to get it more stable 23-0624_1401-28
     let noSlashCommand = command.slice(1);
 
-    const filter = new RegExp('' + match + '.*','gi');
-    if(match && !command.match(filter)) //  let regexp = /[a-d]/gi;
+    const filter = new RegExp('' + match + '.*', 'gi');
+    if (match && !command.match(filter)) //  let regexp = /[a-d]/gi;
       continue;
 
     isSomethingFound = true;
@@ -378,15 +391,15 @@ g_NetworkCommands["/help"] = (match, sendIt2AllForRead = false) => { // if textA
     });
   }
 
-  if(isSomethingFound)
+  if (isSomethingFound)
     saveLastCommand2History(`/help ${match}`);
   else
     text += ` nothing found`
 
-  if(sendIt2AllForRead){
+  if (sendIt2AllForRead) {
     sendMessage("Chat commands if you use this autoCiv Version:");
-    sendMessage(text.replace(/\[.*?\]/g,''))
-  }else
+    sendMessage(text.replace(/\[.*?\]/g, ''))
+  } else
     selfMessage(text);
 
   // ConfigDB_CreateAndSaveValueA26A27("user", "autocivP.chat.lastCommand", `/help ${match}`);
@@ -433,13 +446,13 @@ g_NetworkCommands["/start"] = () => {
 
 g_NetworkCommands["/quit"] = () => {
   if (Engine.HasXmppClient())
-		Engine.LobbySetPlayerPresence("available")
-  Engine.GetGUIObjectByName("cancelButton").onPress()
+    Engine.LobbySetPlayerPresence("available")
+  Engine.TryGetGUIObjectByName("cancelButton").onPress()
 }
 g_NetworkCommands["/exit"] = () => {
   if (Engine.HasXmppClient())
-		Engine.LobbySetPlayerPresence("available")
-  Engine.GetGUIObjectByName("cancelButton").onPress()
+    Engine.LobbySetPlayerPresence("available")
+  Engine.TryGetGUIObjectByName("cancelButton").onPress()
 };
 
 g_NetworkCommands["/countdown"] = (input) => {
@@ -469,13 +482,16 @@ g_NetworkCommands["/gameName"] = (text) => {
 g_NetworkCommands["/pRestoreLastProfile"] = () => {
   const key = 'autocivP.gamesetup.lastCommandProfile'
   let lastCommandProfile = Engine.ConfigDB_GetValue("user", `${key}`);
-  if(lastCommandProfile == '/pRestoreLastProfile') lastCommandProfile = '';
+  if (lastCommandProfile == '/pRestoreLastProfile') lastCommandProfile = '';
   selfMessage(`your last used profile was: ${lastCommandProfile}`);
-	const chatInput = Engine.GetGUIObjectByName("chatInput")
+  const chatInput = Engine.TryGetGUIObjectByName("chatInput")
   chatInput.caption = (lastCommandProfile) ? lastCommandProfile : '/help mainland';
 };
 
 
+g_NetworkCommands["/pWaterMainland"] = (text) => {
+  pWaterMainland();
+};
 g_NetworkCommands["/p0_75popMax"] = (text) => {
   p0_75popMax_Mainland();
 };
@@ -515,11 +531,20 @@ g_NetworkCommands["/4Mainland_defaults"] = (text) => {
 g_NetworkCommands["/pMBMainland_2v2_defaults"] = (text) => {
   pMBMainland_2v2_defaults();
 };
-g_NetworkCommands["/pExtinct_volcano_defaults"] = (text) => {
-  pExtinct_volcano_defaults();
+
+
+g_NetworkCommands["/pSurvivalFittest"] = (text) => {
+  pSurvivalFittest();
 };
-g_NetworkCommands["/pVolcano_Extinct_defaults"] = (text) => {
-  pExtinct_volcano_defaults();
+
+g_NetworkCommands["/pVolcano_defaults"] = (text) => {
+  pVolcano_defaults();
+};
+g_NetworkCommands["/pVolcano_Extrem"] = (text) => { // a often happening typo . it should be extinct_volcano but be more tollerant
+  pVolcano_Extrem();
+};
+g_NetworkCommands["/pVolcano_ExtremExtreme"] = (text) => { // a often happening typo . it should be extinct_volcano but be more tollerant
+  pVolcano_ExtremExtreme();
 };
 g_NetworkCommands["/pUnknown_defaults"] = (text) => {
   pUnknown();
@@ -530,7 +555,7 @@ g_NetworkCommands["/pPolarSeaTheWolfesMap"] = (text) => {
 g_NetworkCommands["/pWolfesInPolarSea"] = (text) => {
   pPolarSeaTheWolfesMap();
 };
-  /*
+/*
 Jitsi for Quick Team Calls
 Jitsi is a great way to have quick team calls without any setup process. It can also be used as an audio chat for your 0ad-team.
 
@@ -591,7 +616,58 @@ g_NetworkCommands["/randomCivs"] = function (excludedCivs) {
   }
 };
 
-function pExtinct_volcano_defaults() {
+
+
+function pWaterMainland() {
+
+  sendMessage("is just a test. try water rising. say its not a bug its a freature")
+
+  pVolcano_defaults()
+
+  g_GameSettings.seaLevelRise.value = 0
+  let ceasefireValue = 2; // 2 minutes it takes that you cant move out of your mountain, when seaLevelRise = 0
+
+  g_GameSettings.ceasefire.value = ceasefireValue
+  let ceasefireStr = `Ceasefire: ${ceasefireValue} minutes`;
+  sendMessage(ceasefireStr);
+
+  setMapTypeFilterNameBiome(
+    "maps/random/mediterranean",
+    "generic/temperate"
+  );
+  g_GameSettings.seaLevelRise.value = 0
+
+  //  game.updateSettings();
+}
+
+
+
+function pSurvivalFittest() {
+
+  sendMessage("pSurvivalFittest is just a test. warer here is not rising")
+  return
+
+
+  // Survival of the Fittest","mapPreview
+  // "VictoryConditions":["conquest"]},"gameSpeed":1,"map":"maps/random/survivalofthefittest"
+  setMapTypeFilterNameBiome(
+    "maps/random/survivalofthefittest",
+    "generic/steppe"
+  );
+
+  g_GameSettings.seaLevelRise.value = 0
+  let ceasefireValue = 2; // 2 minutes it takes that you cant move out of your mountain, when seaLevelRise = 0
+
+  g_GameSettings.ceasefire.value = ceasefireValue
+  let ceasefireStr = `Ceasefire: ${ceasefireValue} minutes`;
+  sendMessage(ceasefireStr);
+
+  game.updateSettings();
+
+
+}
+
+function pVolcano_defaults() {
   // vulcan, vulkan, extinkt <= keywords to find it fast
   setMapTypeFilterNameBiome(
     "maps/random/extinct_volcano",
@@ -608,11 +684,101 @@ function pExtinct_volcano_defaults() {
   // g_GameSettings.SeaLevelRiseTime.value = 10; // error but no effect. extinct_volcano SeaLevelRiseTime
   // g_GameSettings.seaLevelRiseTime.value = 10; // error undefined but no effect. extinct_volcano SeaLevelRiseTime
   // g_GameSettings.SeaLevelRiseTime.cap = 10; // erro. extinct_volcano SeaLevelRiseTime
-  setTeams("team 2v2");
-  return setDefaultsforPopmaxAlliedviewRatingTreasuresNomadExploration();
+  // setTeams("team 2v2");
+  setDefaultsforPopmaxAlliedviewRatingTreasuresNomadExploration();
+
+  // https://github.com/0ad/0ad/blob/61a3b9507d974084e6badb88a0826bd89a6d5b8b/binaries/data/mods/public/gui/gamesetup/Pages/GameSetupPage/GameSettings/Single/Sliders/SeaLevelRiseTime.js#L1
+  // binaries/data/mods/public/gui/gamesetup/Pages/GameSetupPage/GameSettings/Single/Sliders/SeaLevelRiseTime.js
+
+  g_GameSettings.seaLevelRise.value = 0
+  let ceasefireValue = 2; // 2 minutes it takes that you cant move out of your mountain, when seaLevelRise = 0
+
+  g_GameSettings.ceasefire.value = ceasefireValue
+  let ceasefireStr = `Ceasefire: ${ceasefireValue} minutes`;
+  sendMessage(ceasefireStr);
+
+  game.updateSettings();
+
+
+  // return true
+}
+function pVolcano_Extrem() {
+  let bugIt = true && g_selfNick.includes("seeh") // new implementation so i will watch longer
+  if (bugIt)
+    selfMessage(`640: pVolcano_Extrem`)
+  pVolcano_defaults()
+  if (bugIt)
+    selfMessage(`645: pVolcano_Extrem`)
+  // g_InitAttributes.settings.RatingEnabled = false;
+
+  try {
+    g_GameSettings.nomad.enabled = false; // works but through an error
+  } catch (error) {
+    if (bugIt)
+      selfMessage(`650: ${error}`)
+  }
+
+  g_GameSettings.startingResources.resources = 100; // 100 is equal to very low
+  game.updateSettings();
+  if (bugIt)
+    selfMessage(`653: pVolcano_Extrem`)
+}
+
+function pVolcano_ExtremExtreme() {
+  let bugIt = false && g_selfNick.includes("seeh") // new implementation so i will watch longer
+  if (bugIt)
+    selfMessage(`659: pVolcano_ExtremExtreme`)
+
+
+  // setTeams("team 3v3");
+  selfMessage('use kush for AI and with kush-extrem mod AIs get super strong');
+  // todo: add kush-extrem mod automatically
+  pVolcano_Extrem()
+  if (bugIt)
+    selfMessage(`667: pVolcano_ExtremExtreme`)
+
+  try {
+    g_GameSettings.nomad.enabled = true; // works Really ?? i cant believe it anymore 25-0211_1825-37
+    // yes works. but through and error.
+  } catch (error) {
+    if (bugIt)
+      selfMessage(`673: ${error}`)
+  }
+
+  if (bugIt)
+    selfMessage(`677: pVolcano_ExtremExtreme`)
+
+  g_GameSettings.rating.enabled = false
+
+  if (bugIt) {
+    selfMessage(`658: isRated= ${isRated}`)
+    selfMessage(`658: isRated= ${isRated}`)
+    selfMessage(`658: isRated= ${isRated}`)
+    selfMessage(`658: isRated= ${isRated}`)
+    selfMessage(`658: isRated= ${isRated}`)
+    selfMessage(`658: isRated= ${isRated}`)
+  }
+
+
+  g_GameSettings.startingResources.resources = 100; // 100 is equal to very low
+  game.updateSettings();
+
+  isRated = g_GameSettings.RatingEnabled === true
+
+  if (bugIt) {
+
+    selfMessage(`670: isRated= ${isRated}`)
+    selfMessage(`670: isRated= ${isRated}`)
+    selfMessage(`670: isRated= ${isRated}`)
+    selfMessage(`670: isRated= ${isRated}`)
+    selfMessage(`670: isRated= ${isRated}`)
+    selfMessage(`670: isRated= ${isRated}`)
+  }
+
 }
 
 function pMBMainland_2v2_defaults() {
+
   setMapTypeFilterNameBiome(
     "maps/random/mainland_balanced",
     "generic/temperate"
@@ -622,13 +788,38 @@ function pMBMainland_2v2_defaults() {
 }
 
 function p0_75popMax_Mainland() {
+
+
+
+
+  if (Engine.ConfigDB_GetValue("user", "autociv.gamesetup.countdown.enabled") == "false") {
+    // g_autociv_countdown.toggle(true)
+    ConfigDB_CreateAndSaveValueA26A27("user", `autociv.gamesetup.countdown.enabled`, 'true');
+
+    Engine.ConfigDB_CreateValue("user", `autociv.gamesetup.countdown.enabled`, 'true');
+
+    g_autociv_countdown.init();
+
+    g_autociv_countdown.gameUpdateSoft(); // trigger an update to start the timer.
+
+
+    g_GameSettings.seaLevelRise.value = 0
+    selfMessage(`askdfjöasdlfjsdflj`)
+    warn('alsdfjasödlkfj')
+
+
+
+    game.updateSettings();
+
+
+  }
+
+
   setTeams("team 1v1");
   setMapTypeFilterNameBiome(
     "maps/random/mainland",
     "generic/temperate"
   );
-
-
 
   game.updateSettings(); // maybe needet before call mapsize
   let mapSize = 128; // 128 tiny, 192 small,  256 normal, 320 medium // game.set.mapsize(mapsize); //
@@ -639,8 +830,6 @@ function p0_75popMax_Mainland() {
     g_GameSettings.mapSize.size = mapSize;
     game.updateSettings();
   }
-
-
 
   setDefaultsforPopmaxAlliedviewRatingTreasuresNomadExploration();
 
@@ -654,6 +843,13 @@ function p0_75popMax_Mainland() {
   selfMessage(
     m
   );
+
+
+  // if (g_IsController && Engine.ConfigDB_GetValue("user", "autociv.gamesetup.countdown.enabled") == "true")
+  //   g_autociv_countdown.toggle(true)
+
+
+
   return 75;
 
 }
@@ -741,29 +937,29 @@ g_NetworkCommands["/hiRated"] = () => {
 }
 
 g_NetworkCommands["/ratedDefault"] = (text) => {  // works not in lobby, works in a game config
-    const key = "autocivP.gamesetup.ratedDefault";
-    const val = (text) ? 'true' : 'false';
-    ConfigDB_CreateAndSaveValueA26A27("user", key, val);
-    selfMessage(
-      `ratedDefault was set to ${val}`
-    );
+  const key = "autocivP.gamesetup.ratedDefault";
+  const val = (text) ? 'true' : 'false';
+  ConfigDB_CreateAndSaveValueA26A27("user", key, val);
+  selfMessage(
+    `ratedDefault was set to ${val}`
+  );
 }
 
 g_NetworkCommands["/popMaxDefault"] = (text) => {
-    const popMaxDefault = parseInt(text);
-    if(popMaxDefault < 20 || popMaxDefault > 300){
-      selfMessage('number to small or to large');
-      return
-    }
-    const key = "autocivP.TGmainland.PopMaxDefault";
-    const val = popMaxDefault;
-    ConfigDB_CreateAndSaveValueA26A27("user", key, val);
-    selfMessage(
-      `popMaxDefault was set to ${popMaxDefault}`
-    );
-    selfMessage(
-      `when you use will run a profile probably popMaxDefault ${popMaxDefault} will be used.`
-    );
+  const popMaxDefault = parseInt(text);
+  if (popMaxDefault < 20 || popMaxDefault > 300) {
+    selfMessage('number to small or to large');
+    return
+  }
+  const key = "autocivP.TGmainland.PopMaxDefault";
+  const val = popMaxDefault;
+  ConfigDB_CreateAndSaveValueA26A27("user", key, val);
+  selfMessage(
+    `popMaxDefault was set to ${popMaxDefault}`
+  );
+  selfMessage(
+    `when you use will run a profile probably popMaxDefault ${popMaxDefault} will be used.`
+  );
 }
 
 
@@ -782,24 +978,25 @@ g_NetworkCommands["/popMaxDefault"] = (text) => {
 
 
 
-g_NetworkCommands["/gl"] = () =>{
-  const chatInput = Engine.GetGUIObjectByName("chatInput")
+g_NetworkCommands["/gl"] = () => {
+  const chatInput = Engine.TryGetGUIObjectByName("chatInput")
   chatInput.caption = transGGWP_markedStrings_I('gl');
 }
 g_NetworkCommands["/hf"] = () => {
-const chatInput = Engine.GetGUIObjectByName("chatInput")
-chatInput.caption = transGGWP_markedStrings_I('hf');}
+  const chatInput = Engine.TryGetGUIObjectByName("chatInput")
+  chatInput.caption = transGGWP_markedStrings_I('hf');
+}
 g_NetworkCommands["/wp"] = () => {
-const chatInput = Engine.GetGUIObjectByName("chatInput")
-chatInput.caption = transGGWP_markedStrings_I('wp');
+  const chatInput = Engine.TryGetGUIObjectByName("chatInput")
+  chatInput.caption = transGGWP_markedStrings_I('wp');
 }
 g_NetworkCommands["/u2"] = () => {
-const chatInput = Engine.GetGUIObjectByName("chatInput")
-chatInput.caption = transGGWP_markedStrings_I('u2');
+  const chatInput = Engine.TryGetGUIObjectByName("chatInput")
+  chatInput.caption = transGGWP_markedStrings_I('u2');
 }
 g_NetworkCommands["/gg"] = () => {
-const chatInput = Engine.GetGUIObjectByName("chatInput")
-chatInput.caption = transGGWP_markedStrings_I('gg');
+  const chatInput = Engine.TryGetGUIObjectByName("chatInput")
+  chatInput.caption = transGGWP_markedStrings_I('gg');
 }
 
 
@@ -810,18 +1007,17 @@ const originalNetworkCommands = Object.assign({}, g_NetworkCommands);
 // Override the network command functions
 for (const command in g_NetworkCommands) {
   const originalFunction = g_NetworkCommands[command];
-  g_NetworkCommands[command] = function(text) {
+  g_NetworkCommands[command] = function (text) {
     // selfMessage(`777: Command sent: >${command}< >${text}<`);
-    if(command.length > 2 && command.substring(0,2) == '/p' && command != "/pRestoreLastProfile" )
-    {
+    if (command.length > 2 && command.substring(0, 2) == '/p' && command != "/pRestoreLastProfile") {
       // selfMessage('profile command found')
       // selfMessage(command);
       ConfigDB_CreateAndSaveValueA26A27("user", `autocivP.gamesetup.lastCommandProfile`, command);
     }
 
     // later some comands save implicit using saveLastCommand later. example: saveLastCommand(`/help ${match}`); it check if match really match before
-    if(command != 'help')
-      saveLastCommand2History(text ? `${command} ${text}` : `${command}` ); // this is needet. if you want use it int game setupt process 23-0623_1318-59
+    if (command != 'help')
+      saveLastCommand2History(text ? `${command} ${text}` : `${command}`); // this is needet. if you want use it int game setupt process 23-0623_1318-59
 
     // Call the original function
     originalFunction.call(this, text);
@@ -885,7 +1081,7 @@ function setTeams(text) {
 HowTo create a JavaScript function in the 0ad mod autoCiv that changes the map filter? When you get
 HowTo fix the error 'mapFilter is null' in the following JS-function inside file 'gamesetup~!extra_commands' inside the mod autoCiv?
 
-Whey the following function inside 'gamesetup~!extra_commands' of autoCiv dont work and how to fix it?  function setMapFilterTo2() {     var mapFilter = Engine.GetGUIObjectByName("mapFilter");     mapFilter.selected = 2; }
+Whey the following function inside 'gamesetup~!extra_commands' of autoCiv dont work and how to fix it?  function setMapFilterTo2() {     var mapFilter = Engine.TryGetGUIObjectByName("mapFilter");     mapFilter.selected = 2; }
 
 
 Whey is it unpossible to develop a mod like autoCiv to set the mapFilter but easily possble to set resources?
@@ -934,7 +1130,7 @@ function setMapTypeFilterNameBiome(name, biome, type = "random", filter = "defau
 
 
 
-function setDefaultsforPopmaxAlliedviewRatingTreasuresNomadExploration(sendMessageToAll = true){ // forPopmaxAlliedviewRatingTreasuresNomadExploration
+function setDefaultsforPopmaxAlliedviewRatingTreasuresNomadExploration(sendMessageToAll = true) { // forPopmaxAlliedviewRatingTreasuresNomadExploration
   // this function also is(should) always used when a map/profile config is changing 23-0624_1433-08
 
   let bugIt = false // new implementation so i will watch longer
@@ -942,38 +1138,38 @@ function setDefaultsforPopmaxAlliedviewRatingTreasuresNomadExploration(sendMessa
 
 
   g_GameSettings.mapExploration.allied = true; // woks :)  AlliedView
-  if(sendMessageToAll)sendMessage('AlliedView = true');
+  if (sendMessageToAll) sendMessage('AlliedView = true');
 
-            // autocivP.gamesetup.ratedDefault
+  // autocivP.gamesetup.ratedDefault
   const key = "autocivP.gamesetup.ratedDefault"; // in user.cfg
   const ratedDefault = Engine.ConfigDB_GetValue(
     "user",
     key
   );
 
-  g_GameSettings.rating.enabled = (ratedDefault === 'true') ? true : false ; // no error and test in the lobby. it works
+  g_GameSettings.rating.enabled = (ratedDefault === 'true') ? true : false; // no error and test in the lobby. it works
   // game.updateSettings();
 
-    if(bugIt){
-      if(ratedDefault == 'true'){
-        selfMessage(`922: rated shold enabled gui/gamesetup/gamesetup~!extra_commands.js`);
-      }else{
-        selfMessage(`924: rated should not enabled gui/gamesetup/gamesetup~!extra_commands.js`);
-      }
-      selfMessage(`926: =========================================================== gui/gamesetup/gamesetup~!extra_commands.js`);
-      selfMessage(`927: ratedDefault: ${ratedDefault} = ${(ratedDefault === 'true')} = enabled={${g_GameSettings.rating.enabled}} gui/gamesetup/gamesetup~!extra_commands.js`);
+  if (bugIt) {
+    if (ratedDefault == 'true') {
+      selfMessage(`922: rated shold enabled gui/gamesetup/gamesetup~!extra_commands.js`);
+    } else {
+      selfMessage(`924: rated should not enabled gui/gamesetup/gamesetup~!extra_commands.js`);
     }
+    selfMessage(`926: =========================================================== gui/gamesetup/gamesetup~!extra_commands.js`);
+    selfMessage(`927: ratedDefault: ${ratedDefault} = ${(ratedDefault === 'true')} = enabled={${g_GameSettings.rating.enabled}} gui/gamesetup/gamesetup~!extra_commands.js`);
+  }
 
 
-  if(sendMessageToAll)sendMessage(`rating = ${ratedDefault}`);
+  if (sendMessageToAll) sendMessage(`rating = ${ratedDefault}`);
 
   // gui/gamesetup/Pages/GameSetupPage/GameSettings/Single/Checkboxes/Treasures.js
   g_GameSettings.disableTreasures.enabled = true;
-  if(sendMessageToAll)sendMessage('disableTreasures = true');
-  g_GameSettings.nomad.enabled = false; // works
-  if(sendMessageToAll)sendMessage('nomad = false');
+  if (sendMessageToAll) sendMessage('disableTreasures = true');
+  // g_GameSettings.nomad.enabled = false; // works
+  if (sendMessageToAll) sendMessage('nomad = false');
   g_GameSettings.mapExploration.enabled = false; // todo: dont work
-  if(sendMessageToAll)sendMessage('mapExploration = false');
+  if (sendMessageToAll) sendMessage('mapExploration = false');
 
   let popMaxDefault = Engine.ConfigDB_GetValue(
     "user",
@@ -983,10 +1179,10 @@ function setDefaultsforPopmaxAlliedviewRatingTreasuresNomadExploration(sendMessa
     popMaxDefault = 200;
   }
   g_GameSettings.population.cap = popMaxDefault; // works its a number option vield
-  if(sendMessageToAll)sendMessage('popMaxDefault = ' + popMaxDefault);
+  if (sendMessageToAll) sendMessage('popMaxDefault = ' + popMaxDefault);
 
   g_GameSettings.startingResources.resources = 300; // works ist a radio selct field
-  if(sendMessageToAll)sendMessage('startingResources = ' + g_GameSettings.startingResources.resources);
+  if (sendMessageToAll) sendMessage('startingResources = ' + g_GameSettings.startingResources.resources);
 
   // game.updateSettings(); // this neds to disabled ! becouse some rating was not correct set
 
@@ -1009,11 +1205,12 @@ function setDefaultsforPopmaxAlliedviewRatingTreasuresNomadExploration(sendMessa
   // const key2 = 'autocivP.gamesetup.lastCommand4Profile'
   // ConfigDB_CreateAndSaveValueA26A27("user", key2, g_lastCommandID);
 
+  g_GameSettings.ceasefire.value = 0
+
   return populationMax;
 }
 
-function sendMessageMapSizeSetTo(mapSize)
-{
+function sendMessageMapSizeSetTo(mapSize) {
   // sendMessage(`Map size set to: ${mapsize}`);
   const mapSizes = [
     { size: 128, label: 'tiny' },

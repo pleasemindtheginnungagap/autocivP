@@ -137,7 +137,7 @@ function autociv_showBuildingPlacementTerrainSnap(mousePosX, mousePosY)
 function autociv_placeBuildingByTemplateName(templateName)
 {
 	// Hack: fast check
-	if (Engine.GetGUIObjectByName("unitConstructionPanel").hidden)
+	if (Engine.TryGetGUIObjectByName("unitConstructionPanel").hidden)
 		return;
 
 	const cycleTemplates = Engine.ConfigDB_GetValue("user", "autociv.session.building.place." + templateName).match(/[^\W]+/g)
@@ -154,8 +154,26 @@ function autociv_placeBuildingByTemplateName(templateName)
 		self.state.index = (self.state.index + 1) % templates.length
 		let templateToSelect = templates[self.state.index]
 
-		let index = g_SelectionPanels.Construction.getItems().
-			findIndex(templatePath => templatePath.endsWith(templateToSelect));
+// gui/session/input~!autociv.js:159
+// ~/.local/share/0ad/mods/autocivp/gui:159
+// alt:
+//		let index = g_SelectionPanels.Construction.getItems().
+//			findIndex(templatePath => templatePath.endsWith(templateToSelect));
+// neu:
+
+//        let index = g_SelectionPanels.Construction.getItems(g_Selection.toList().map(GetEntityState)).
+//                    findIndex(templatePath => templatePath.endsWith(templateToSelect));
+
+
+        let index = g_SelectionPanels.Construction.getItems(g_Selection.toList().map(GetEntityState)).
+                    findIndex(templatePath => {
+                        let pathStr = "";
+                        if (typeof templatePath === "string")
+                            pathStr = templatePath;
+                        else if (templatePath && typeof templatePath === "object")
+                            pathStr = templatePath.template || templatePath.templateName || templatePath.id || "";
+                        return pathStr.endsWith(templateToSelect);
+                    });
 
 		if (index == -1)
 			continue;
@@ -193,14 +211,14 @@ autociv_placeBuildingByTemplateName.buttons = new Proxy({}, {
 	{
 		return key in target ?
 			target[key] :
-			target[key] = Engine.GetGUIObjectByName(`unitConstructionButton[${key}]`);
+			target[key] = Engine.TryGetGUIObjectByName(`unitConstructionButton[${key}]`);
 	}
 })
 
 function autociv_clearSelectedProductionQueues()
 {
 	// Hack: fast check
-	if (Engine.GetGUIObjectByName("unitQueuePanel").hidden)
+	if (Engine.TryGetGUIObjectByName("unitQueuePanel").hidden)
 		return;
 
 	g_Selection.toList().map(GetEntityState).forEach(entity =>

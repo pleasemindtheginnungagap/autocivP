@@ -2,6 +2,19 @@ var gameState = "lobby"; // Initial state // // TODO: howto set it like this? g_
 
 var g_selfIsHost
 
+var g_isnitialIsSet_prettyDisable_prettyEnable = false
+
+const auto_prettyDisable_when_playersNR = Engine.ConfigDB_GetValue(
+	"user",
+	"autocivP.auto_prettyDisable_when_playersNR"
+);
+
+
+var g_minMatchScore =  Engine.ConfigDB_GetValue(
+	"user",
+	"autocivP.fuzzy_minMatchScore"
+);
+
 var g_playerIsGreeted = []
 
 var g_PLineGithub = 'https://github.com/sl5net/PLine';
@@ -101,9 +114,9 @@ function isSelfHost(){ // maybe call it in a settimeout assync function
 //   }
 
 
-const g_customIconJson = Engine.ReadJSONFile("moddata/autocivP_IconNames.json");
+const g_customIconJson = Engine.ReadJSONFile("moddata/autocivP_commandVariations.json");
 var g_fuzzyArrayResult = getFuzzyArrayFromJsonFile(g_customIconJson, true)
-// var g_fuzzyArrayResult = getFuzzyArrayFromJsonFile("moddata/autocivP_IconNames.json", false)
+// var g_fuzzyArrayResult = getFuzzyArrayFromJsonFile("moddata/autocivP_commandVariations.json", false)
 
 var g_is_chatInputTooltipQuickFixUpdate_updated = false
 
@@ -118,7 +131,7 @@ var g_chatTextInInputFild_when_msgCommand_lines = 0
 
 var p_textBeforeTemp = ''
 
-const chatInput = Engine.GetGUIObjectByName("chatInput")
+const chatInput = Engine.TryGetGUIObjectByName("chatInput")
 if(chatInput)
   chatInput.caption = '/away 18'
 
@@ -142,8 +155,24 @@ about mod names about mod.io here tips:
 https://wildfiregames.com/forum/topic/24333-guide-for-publishing-mods-on-modio/?do=findComment&comment=554945
 */
 
+// const howToRememberIt = `. take a photo with your phone or better take a screenshot, if you know how. Visit the website and take it. BTW with ...P mod you can copy text from chat.  `
+
+
+// const howToRememberIt1 = ". Need to remember this? Take a screenshot! Or, if you know the location, take a photo with your phone. If you're in [Platform name - e.g., Discord], the ...P mod can let you copy text from the chat."
+
+// const howToRememberIt2 = ". Need to remember this? The easiest way is to take a screenshot. Or, if you know the location, take a photo with your phone. If the text is selectable, you could also copy and paste it into a document."
+
+// const howToRememberIt3 = ". Having trouble remembering this? Try taking a screenshot or a photo with your phone!"
+
+const howToRememberIt = ". Screenshot it / Photo with your phone. Bonus: With autocivP mod, you can copy chat!";
 
 const versionOf0ad = Engine.GetEngineInfo().mods[0]['version']; // 0.0.26
+function getRevisionNumber(versionString) {
+	const match = versionString.match(/(\d{2})/); // Matches 2 digits
+	return match[1];
+  }
+  const revisionNumber = getRevisionNumber(versionOf0ad);
+
 // const zipOfAutocivPMod = 'https://api.mod.io/v1/games/5/mods/3105810/files/4097856/download'
 
 const g_autocivPVersion_shared = get_autocivPVersion()
@@ -157,14 +186,22 @@ const actuallyWorkingAtVersion = g_previous_autocivPVersion == g_autocivPVersion
 // warn(`actually working at version ${actuallyWorkingAtVersion}`)
 
 // const whatsAutocivPMod = `AutoCivP mod is AutoCiv but it also supports profiles during game configuration, jitsi, command-history⟦Tab⟧⟦Tab⟧ and a lot more ( https://wildfiregames.com/forum/topic/107371-autocivp-add-ons-profiles-jitsi-team-call ) \n 1. download newest ZIP here ${zipOfAutocivPMod} \n 2. unzip it \n 3. rename folder to "autocivP" \n 4. copy this folder to "mods" folder. Path to user data: \n Linux     : ~/.config/0ad/mods \n Windows: %AppData%\\0ad\\mods \n macOS    : \/Users\/{YOUR USERNAME}\/Library\/Application\\ Support/0ad/mods \n tart 0 A.D., click Settings and Mod Selection. \n Double-click it, click Save Configuration and Start Mods. \n ${actuallyWorkingAtVersion} `
+//
+const whatsAutocivPMod = `AutoCivP ▐itlip.com ▐SL5.de/mods ▐github.com/sl5net/autocivP ${howToRememberIt}`
 
-const whatsAutocivPMod = `AutoCivP supports profiles, audio chat, Reuse Drafts, toggle graphics quickly during the game, command-history, icon and a lot more ( https://wildfiregames.com/forum/topic/107371-autocivp-add-ons-profiles-jitsi-team-call ) \n ${actuallyWorkingAtVersion} `
+const whatsAutocivPMod_long = `AutoCivP mod is AutoCiv but it also supports profiles during game configuration, jitsi and a lot more ( https://wildfiregames.com/forum/topic/107371-autocivp-add-ons-profiles-jitsi-team-call ) \n 1. download newest ZIP here ${zipOfAutocivPMod} \n 2. unzip it \n 3. copy this folder to "mods" folder.  4. \n Double-click it in "Settings" > "Mod Selection", click "Save Configuration" and "Start Mods". \n ${actuallyWorkingAtVersion} ${howToRememberIt}`
 
-const whatsAutocivPMod_long = `AutoCivP mod is AutoCiv but it also supports profiles during game configuration, jitsi and a lot more ( https://wildfiregames.com/forum/topic/107371-autocivp-add-ons-profiles-jitsi-team-call ) \n 1. download newest ZIP here ${zipOfAutocivPMod} \n 2. unzip it \n 3. copy this folder to "mods" folder.  4. \n Double-click it in "Settings" > "Mod Selection", click "Save Configuration" and "Start Mods". \n ${actuallyWorkingAtVersion} `
+const whatsCommunityMod = `communityMod is community-powered by the core team to improve the gameplay experience, particularly MP balance. The team wanted to give the community make it easier to contribute, thus this is hosted on gitlab and community members can request commit access ( https://gitlab.com/0ad/0ad-community-mod-a26 ) . ${howToRememberIt}`
 
-const whatsCommunityMod = `communityMod is community-powered by the core team to improve the gameplay experience, particularly MP balance. The team wanted to give the community make it easier to contribute, thus this is hosted on gitlab and community members can request commit access ( https://gitlab.com/0ad/0ad-community-mod-a26 ) .`
-
+const whatsReplay_pallas = ` https://replay-pallas.wildfiregames.ovh/LocalRatings . LocalRatings compares the "Total score" graphs of a player with the "Total score" average graphs. ${howToRememberIt}`
 // zipOfAutocivPMod = `https://github.com/sl5net/autocivP/archive/refs/tags/v${g_previous_autocivPVersion}.zip`
+
+const whatsModernGUIA27 = ` https://gitlab.com/4trik/proGUI/-/tree/modernGUIA27 . proGUI-modernGUIA27 or modernGUIA27 looks like BoonGUI but for A27 ${howToRememberIt}`
+// https://gitlab.com/4trik/proGUI/-/tree/modernGUIA27
+//
+
+
+
 
 
 function get_previous_autocivPVersion(g_autocivPVersion) {
@@ -225,9 +262,10 @@ function chatInputTooltipQuickFixUpdate() {
 	// const tab = '⟦[color=\"220 255 153\"]Tab[/color]⟧'
 	// const tab = '\[Tab\]' // => creates errors
 	const tab = '⟦Tab⟧'
-	const chatInput = Engine.GetGUIObjectByName("chatInput")
+	const enter = '⟦Enter⟧'
+	const chatInput = Engine.TryGetGUIObjectByName("chatInput")
 	if(chatInput){
-	  chatInput.tooltip += ` Or try ${tab}  to autocomplete commands for select profile, chosen icons ( allicons+${tab} ☯ ♪♣‹) or other commands. Write "⁄help" or  "⁄help  ⁄∖d" or  "⁄help ⁄p" for more info about "/" commands.\n`
+	  chatInput.tooltip += ` Or try ${tab} to autocomplete commands. Write "help" then press ${tab}\n and try "⁄help" or  "⁄help  ⁄∖d" or "⁄help ⁄p" then ${enter} for more info about "/" commands.\n`
 	  chatInput.tooltip += ' Matching algorithm is more strict when text is longer.\n'
 	  chatInput.tooltip += 'Use uppercase to temporarily reduce the sensitivity of the substitutions mechanism\n'
 	  chatInput.tooltip += `Use ${tab} in empty chat to 1. Copy a chat message that was posted to you. 2. Retrieve your chat draft.`
@@ -359,95 +397,118 @@ function transGGWP_markedStrings_I(gg, minMatchScore) {
 
 
 
-function translGGWP_U2Gg_III(gg, minMatchScore) {
-	let isDebug = false
-	// isDebug = true
-
-
-	if( g_selfNick =="seeh"){
-	}
-
-	if(isDebug)
-		selfMessage(`344: ____________ translGGWP_U2Gg_III(${gg}, ${minMatchScore}) ___________`);
-	if( !minMatchScore){
-		if( g_selfNick =="seeh" ){
-			// selfMessage(`347: minMatchScore = ${minMatchScore}`);
-			// error(`minMatchScore is not defined`);
-		}
-		minMatchScore = 0.8 // some value. quick fix. todo: why its empty? 23-0729_1618-01
-	}
-
-	let lowercaseGg = gg.toLowerCase()
-	let doSend2allChatUsers = false
-	if (lowercaseGg == 'allicons2All'.toLocaleLowerCase()) {
-		doSend2allChatUsers = true
-		lowercaseGg = 'allicons'
-	}
-	if (lowercaseGg == 'allicons') {
-	  const vArr = Object.keys(g_customIconJson);
-	  let s = 'allicons: '
-	  vArr.forEach((k, v) => {
-		  const vArr = Object.values(g_customIconJson[k]);
-		if(doSend2allChatUsers)
-		  	sendMessage(`${k} <- ${vArr}`);
-		else
-			selfMessage(`${k} <- ${vArr}`);
-		  s += `${k} < ${vArr}`
-		  s += ` | `
-	  })
-	  const t = `you dont need write it ecactly. it finds results also if you write to less or bit wrong (its fuzzy-search). disable all icons in settings in options menu. some are contect senitive.`
-	  s += t
-	  if(doSend2allChatUsers)
-		  sendMessage(`${t}`);
-	  else
-	    selfMessage(`${t}`);
-	return s // its big string so it will be cut off somewhere in the middle
-	}
-	if (lowercaseGg == 'alliconkeys') {
-	  const vArr = Object.keys(g_customIconJson);
-	  const s = 'alliconkeys: ' + vArr.join(', ');
-	  selfMessage(`${s}`);
-	  return s
-	}
 
 
 
-	// https://unicodeemoticons.com/
-	// btw guiObject is not definded her so you cant use this: sendMessageGlHfWpU2Gg(..., guiObject)
 
 
-	// ‹be right back ☯ ›
+  function translGGWP_U2Gg_III(gg, minMatchScore, reduceAmount = false, startIndex = 0, endIndex = 99999) {
+    let isDebug = false;
 
-	let text =  '';
+    if (g_selfNick == "seeh") {}
 
-	let query
-	query = gg;
-	// warn('/' + '‾'.repeat(32));
+    if (isDebug)
+        selfMessage(`344: ____________ translGGWP_U2Gg_III(${gg}, ${minMatchScore}, ${reduceAmount}) ___________`);
 
+    if (!minMatchScore) {
+        if (g_selfNick == "seeh") {
+            // selfMessage(`347: minMatchScore = ${minMatchScore}`);
+            // error(`minMatchScore is not defined`);
+        }
+        minMatchScore = 0.8 // some value. quick fix. todo: why its empty? 23-0729_1618-01
+    }
 
-	let stringWithUnicode = findBestMatch(query, g_fuzzyArrayResult, minMatchScore);
+    let lowercaseGg = gg.toLowerCase();
+    let doSend2allChatUsers = false;
 
+    if (lowercaseGg == 'allicons2All'.toLocaleLowerCase()) {
+        doSend2allChatUsers = true;
+        lowercaseGg = 'allicons';
+    }
 
-	if(  stringWithUnicode
-		&& stringWithUnicode.bestMatch
-		&& Engine.ConfigDB_GetValue("user", `autociv.chatText.font.useitwithoutUnicode`) === 'true'
-		)
-		stringWithUnicode.bestMatch = stringWithUnicode.bestMatch.replace(/[^\x00-\x7F]/g, "");
+    if (lowercaseGg == 'allicons') {
+        const vArr = Object.keys(g_customIconJson);
+        let s = 'allicons: ';
 
-	// stringWithoutUnicode
+		for (let i = startIndex; i < endIndex && i < vArr.length; i++) {
+			const k = vArr[i]; // Get key by index
 
-	if(isDebug){
-		warn(`120: Best match for query "${query}": ##${stringWithUnicode.bestMatch}## (${stringWithUnicode.bestMatchWord})`);
-		selfMessage(`414: Best match for query "${query}": ##${stringWithUnicode.bestMatch}## (${stringWithUnicode.bestMatchWord} , ${minMatchScore})`);
-		warn('\\________________________________')
-	}
+        // vArr.forEach((k, v) => {
+            let displayValue;
+            if (reduceAmount === true) {
+                // Show only the first value if reduceAmount is true
+                displayValue = Object.values(g_customIconJson[k])[0] + ' ...' || ""; // Get first value or empty string
+            } else {
+                // Show all values joined by commas if reduceAmount is false
+                displayValue = Object.values(g_customIconJson[k]).join(", ");
+            }
 
-	if(stringWithUnicode && stringWithUnicode.bestMatch)
-		return stringWithUnicode.bestMatch;
+            const output = `${k} <- ${displayValue}`;
 
-		// todo: this is not working. needs implementd again
-	  return gg;
+            if (doSend2allChatUsers)
+                sendMessage(output);
+            else
+                selfMessage(output);
+
+            s += `${k} < ${displayValue} | `;
+        }
+
+        // let t = `you dont need write it ecactly. it finds results also if you write to less or bit wrong (its fuzzy-search). disable all icons in settings in options menu. some are contect senitive.`;
+        //  t += `\n that are tab commands. write it end enable the command with tab.`;
+
+		let t = "Fuzzy search for commands and icons! (typos are tolerated). Some are context-sensitive. Press Tab to run the command."
+
+		s = t + s + t;
+        if (doSend2allChatUsers)
+            sendMessage(`${t}`);
+        else
+            selfMessage(`${t}`);
+
+        return s; // its big string so it will be cut off somewhere in the middle
+    }
+
+    if (lowercaseGg == 'alliconkeys') {
+        const vArr = Object.keys(g_customIconJson);
+        const s = 'alliconkeys: ' + vArr.join(', ');
+        selfMessage(`${s}`);
+        return s;
+    }
+
+    // https://unicodeemoticons.com/
+    // btw guiObject is not definded her so you cant use this: sendMessageGlHfWpU2Gg(..., guiObject)
+
+    // ‹be right back ☯ ›
+
+    let text = '';
+    let query = gg;
+
+    let stringWithUnicode = findBestMatch(query, g_fuzzyArrayResult, minMatchScore);
+
+    if (stringWithUnicode &&
+        stringWithUnicode.bestMatch &&
+        Engine.ConfigDB_GetValue("user", `autociv.chatText.font.useitwithoutUnicode`) === 'true'
+    )
+        stringWithUnicode.bestMatch = stringWithUnicode.bestMatch.replace(/[^\x00-\x7F]/g, "");
+
+    if (isDebug) {
+        warn(`120: Best match for query "${query}": ##${stringWithUnicode.bestMatch}## (${stringWithUnicode.bestMatchWord})`);
+        selfMessage(`414: Best match for query "${query}": ##${stringWithUnicode.bestMatch}## (${stringWithUnicode.bestMatchWord} , ${minMatchScore})`);
+        warn('\\________________________________')
+    }
+
+    if (stringWithUnicode && stringWithUnicode.bestMatch)
+        return stringWithUnicode.bestMatch;
+
+    // todo: this is not working. needs implementd again
+    return gg;
 }
+
+
+
+
+
+
+
 
 
 
@@ -560,7 +621,7 @@ const g_autociv_SharedCommands = {
 						helloAllText = 'hi hf.';
 						ConfigDB_CreateAndSaveValueA26A27("user", key, helloAllText);
 				}
-				const chatInput = Engine.GetGUIObjectByName("chatInput")
+				const chatInput = Engine.TryGetGUIObjectByName("chatInput")
 				chatInput.caption = helloAllText
 					}
 			}
@@ -569,7 +630,7 @@ const g_autociv_SharedCommands = {
 		"description": "AutoCivP mod is ",
 		"handler": () =>
 		{
-			const chatInput = Engine.GetGUIObjectByName("chatInput")
+			const chatInput = Engine.TryGetGUIObjectByName("chatInput")
 			chatInput.focus()
 			chatInput.caption = `${zipOfAutocivPMod} (28 July 2023)` // that version from 23-0728_0140-50
 		}
@@ -578,7 +639,7 @@ const g_autociv_SharedCommands = {
 		"description": "AutoCivP mod is ",
 		"handler": () =>
 		{
-			const chatInput = Engine.GetGUIObjectByName("chatInput")
+			const chatInput = Engine.TryGetGUIObjectByName("chatInput")
 			chatInput.focus()
 			chatInput.caption = whatsAutocivPMod
 		}
@@ -587,7 +648,7 @@ const g_autociv_SharedCommands = {
 		"description": "legend of some special symbols",
 		"handler": () =>
 		{
-			const chatInput = Engine.GetGUIObjectByName("chatInput")
+			const chatInput = Engine.TryGetGUIObjectByName("chatInput")
 			chatInput.focus()
 			chatInput.caption = `legend: ♤ proGUI mod, ♇ autocivP mod`
 
@@ -601,7 +662,7 @@ const g_autociv_SharedCommands = {
 		"handler": () =>
 		{
 			const text = '2021: When BatchTraining reach 27 units, Batching will match 1by1 in Total ActiveTime generated ( https://wildfiregames.com/forum/topic/53327-batch-training-the-good-the-bad-and-the-ugly/ ) '
-			const chatInput = Engine.GetGUIObjectByName("chatInput")
+			const chatInput = Engine.TryGetGUIObjectByName("chatInput")
 			chatInput.focus()
 			chatInput.caption = text
 		}
@@ -611,7 +672,7 @@ const g_autociv_SharedCommands = {
 		"handler": () =>
 		{
 			const text = 'Some call ProGUI a better AutoQueue or smart Eco-Management ( https://wildfiregames.com/forum/topic/106491-progui/page/7/ ) .'
-			const chatInput = Engine.GetGUIObjectByName("chatInput")
+			const chatInput = Engine.TryGetGUIObjectByName("chatInput")
 			chatInput.focus()
 			chatInput.caption = text
 		}
@@ -621,7 +682,7 @@ const g_autociv_SharedCommands = {
 		"handler": () =>
 		{
 			const whatsAutocivMod = 'AutoCiv mod is an aggregation of features meant to enhance the 0 A.D. HotKeys and more. Many players use it ( https://wildfiregames.com/forum/topic/28753-autociv-mod-0ad-enhancer ) .'
-			const chatInput = Engine.GetGUIObjectByName("chatInput")
+			const chatInput = Engine.TryGetGUIObjectByName("chatInput")
 			chatInput.focus()
 			chatInput.caption = whatsAutocivMod
 		}
@@ -631,7 +692,7 @@ const g_autociv_SharedCommands = {
 		"handler": () =>
 		{
 			const text = '"Allied View" is a game option thats been added to vanilla 0ad a26. When the option is enabled, allies will basically have "cartography mode" on at the start of the game. '
-			const chatInput = Engine.GetGUIObjectByName("chatInput")
+			const chatInput = Engine.TryGetGUIObjectByName("chatInput")
 			chatInput.focus()
 			chatInput.caption = text
 		}
@@ -641,7 +702,7 @@ const g_autociv_SharedCommands = {
 		"handler": () =>
 		{
 			const whatsThisMod = 'boonGUI is best  mod to watch replays (its build by Langbart and others. to could update was moved to https://github.com/0ad-matters/boonGUI ) .'
-			const chatInput = Engine.GetGUIObjectByName("chatInput")
+			const chatInput = Engine.TryGetGUIObjectByName("chatInput")
 			chatInput.focus()
 			chatInput.caption = whatsThisMod
 		}
@@ -651,7 +712,7 @@ const g_autociv_SharedCommands = {
 		"handler": () =>
 		{
 			const JitsiText = 'Jitsi is a great way to have quick team calls without any setup process. It can also be used as an audio chat for your 0ad-team.'
-			const chatInput = Engine.GetGUIObjectByName("chatInput")
+			const chatInput = Engine.TryGetGUIObjectByName("chatInput")
 			chatInput.focus()
 			chatInput.caption = JitsiText
 		}
@@ -661,7 +722,7 @@ const g_autociv_SharedCommands = {
 		"handler": () =>
 		{
 			const JitsiText = `feldmap mod adds the map "Mainland balanced". Alpine Mountains is also included ( https://https://wildfiregames.com/forum/topic/53880-feldmap ) `
-			const chatInput = Engine.GetGUIObjectByName("chatInput")
+			const chatInput = Engine.TryGetGUIObjectByName("chatInput")
 			chatInput.focus()
 			chatInput.caption = JitsiText
 		}
@@ -671,11 +732,31 @@ const g_autociv_SharedCommands = {
 		"handler": () =>
 		{
 			const text = whatsCommunityMod
-			const chatInput = Engine.GetGUIObjectByName("chatInput")
+			const chatInput = Engine.TryGetGUIObjectByName("chatInput")
 			chatInput.focus()
 			chatInput.caption = text
 			//  seems not working in looby but in setup and ingame 23-0806_1937-40 ?
 			// and i press tab then to fuzzy search changes it to the toggle command
+		}
+	},
+	"whatsReplay_pallas" : {
+		"description": "Replay_pallas is ",
+		"handler": () =>
+		{
+			const text = whatsReplay_pallas
+			const chatInput = Engine.TryGetGUIObjectByName("chatInput")
+			chatInput.focus()
+			chatInput.caption = text
+		}
+	},
+	"whatsModernGUIA27" : {
+		"description": "ModernGUIA27 is ",
+		"handler": () =>
+		{
+			const text = whatsModernGUIA27
+			const chatInput = Engine.TryGetGUIObjectByName("chatInput")
+			chatInput.focus()
+			chatInput.caption = text
 		}
 	},
 	"programmers" : {
@@ -686,7 +767,7 @@ const text = `If you have suggestions for changinge the source-code a bit, share
 BTW for chat maybe use https://matrix.to/#/#0ad:matrix.org, https://webchat.quakenet.org/?channels=0ad, maybe https://discord.gg or any other chat service.
 BTW list of functions: https://trac.wildfiregames.com/wiki/EngineFunctions
 .`
-			const chatInput = Engine.GetGUIObjectByName("chatInput")
+			const chatInput = Engine.TryGetGUIObjectByName("chatInput")
 			chatInput.focus()
 			chatInput.caption = text.replace(/\r\t/g, '') // tabe needs to be fut off. also ths wagenrücklauf
 		}
@@ -702,7 +783,7 @@ BTW list of functions: https://trac.wildfiregames.com/wiki/EngineFunctions
 			const hours = today.getHours().toString().padStart(2, '0');
 			const minutes = today.getMinutes().toString().padStart(2, '0');
 			const text = `it's ${hours}:${minutes} here.`
-			const chatInput = Engine.GetGUIObjectByName("chatInput");
+			const chatInput = Engine.TryGetGUIObjectByName("chatInput");
 
 			chatInput.focus()
 			chatInput.caption = text; // for some reasons this is not working in lobby at the moment 23-0724_0958-02. its ignored
@@ -721,7 +802,7 @@ BTW list of functions: https://trac.wildfiregames.com/wiki/EngineFunctions
 			const hours = today.getHours().toString().padStart(2, '0');
 			const minutes = today.getMinutes().toString().padStart(2, '0');
 			const text = `it's ${hours}:${minutes} here.`;
-			const chatInput = Engine.GetGUIObjectByName("chatInput");
+			const chatInput = Engine.TryGetGUIObjectByName("chatInput");
 
 			if( gameState == "lobby" )
 				sendMessage(text)
@@ -750,7 +831,7 @@ BTW list of functions: https://trac.wildfiregames.com/wiki/EngineFunctions
 			);
 			// sendMessage(`Mods I'm currently using: ${enabledmods.slice(11,)}` );
 			const text = `Mods I'm currently using: ${enabledmods.slice(11,)} ${g_previous_autocivPVersion}`;
-			const chatInput = Engine.GetGUIObjectByName("chatInput")
+			const chatInput = Engine.TryGetGUIObjectByName("chatInput")
 			chatInput.focus()
 			chatInput.caption = text
 		}
@@ -764,7 +845,7 @@ BTW list of functions: https://trac.wildfiregames.com/wiki/EngineFunctions
 			// in lobby long text will eventually crash the game. 23-0629_0840-55
 			// Engine.SendNetworkChat(text);
 
-			const chatInput = Engine.GetGUIObjectByName("chatInput")
+			const chatInput = Engine.TryGetGUIObjectByName("chatInput")
 			chatInput.focus()
 			chatInput.caption = text
 
@@ -777,7 +858,7 @@ BTW list of functions: https://trac.wildfiregames.com/wiki/EngineFunctions
 			let text = ''
 			text = `write li⟦Tab⟧ or /link<enter> to open a link`;
 			// Engine.SendNetworkChat(text);
-			const chatInput = Engine.GetGUIObjectByName("chatInput")
+			const chatInput = Engine.TryGetGUIObjectByName("chatInput")
 			chatInput.focus()
 			chatInput.caption = text
 		}
@@ -796,6 +877,38 @@ BTW list of functions: https://trac.wildfiregames.com/wiki/EngineFunctions
 
 			botManager.get("mute").instance.setValue(nick, nick);
 			selfMessage(`You have muted ${nick}.`);
+		}
+	},
+	"m": {
+		"description": "Mute player (m = mute).",
+		"handler": (player) =>
+		{
+			if (player == "")
+				return selfMessage("You need to type a nick to mute player at all places with chat.")
+			let nick = splitRatingFromNick(player).nick;
+
+			if(nick == g_selfNick)
+				return selfMessage(`not allowed to mute yourself ${g_selfNick}.`)
+
+			botManager.get("mute").instance.setValue(nick, nick);
+			selfMessage(`You have muted ${nick}.`);
+		}
+	},
+	"u": {
+		"description": "Clear list of muted players (u = unmute all).",
+		"handler": () =>
+		{
+			botManager.get("mute").instance.removeAllValues();
+			selfMessage("You have cleared muted list.");
+		}
+	},
+	"p": {
+		"description": "whatsAutocivPMod",
+		"handler": () =>
+		{
+			const chatInput = Engine.TryGetGUIObjectByName("chatInput")
+			chatInput.focus()
+			chatInput.caption = whatsAutocivPMod
 		}
 	},
 	"unmute": {
@@ -928,10 +1041,23 @@ autociv_InitSharedCommands.pipe = {
 	"lobby": key =>
 	{
 		gameState = "lobby";
-		const chatInput = Engine.GetGUIObjectByName("chatInput")
+		const chatInput = Engine.TryGetGUIObjectByName("chatInput")
 		if(chatInput && chatInput.caption.length < 1){
 			chatInput.focus()
-  			chatInput.caption = '/away' // just a suggestion. maybe you want to be away from the begginning. first check who is online. maybe want join as observer later. not always want play from the begginning.
+
+			let lobbyInitialCaption  = Engine.ConfigDB_GetValue(
+				"user",
+				"autocivP.lobby.InitialCaption"
+				);
+
+				lobbyInitialCaption = lobbyInitialCaption.replace(/→me/g, g_selfNick); // searches for messages for your from you or where you name is mentioned
+
+				if(lobbyInitialCaption.length < 1){
+					lobbyInitialCaption  = '/away'
+				}
+
+
+  			chatInput.caption =lobbyInitialCaption  // '/away' // just a suggestion. maybe you want to be away from the begginning. first check who is online. maybe want join as observer later. not always want play from the begginning.
 			// works without any problem, but pipe is maybe not the best way
 
 			// i peronally like to be away as suggestion in the caption because it is easy to read and a learning experience
@@ -1005,6 +1131,31 @@ autociv_InitSharedCommands.pipe = {
 				selfMessage(`961: rated: ${g_InitAttributes.settings.RatingEnabled === true} - gui/common/~autocivSharedCommands.js : ${linnr()}`)
 			}
 		}
+
+		// works without error:
+		//  selfMessage(JSON.stringify(g_PlayerAssignments));
+		// selfMessage(`1093: ${g_Players.length}`) // this also counts Gaia
+
+		// if(!auto_prettyDisable_when_playersNR){
+		// 	error('25-0205_1123-17')
+		// 	selfMessage(`1094: ${g_isnitialIsSet_prettyDisable_prettyEnable}`)
+		// }
+
+		// not useful because of error:
+		//  selfMessage(JSON.stringify(g_ProjectInformation));
+
+
+		if(
+			g_isnitialIsSet_prettyDisable_prettyEnable == false
+			&& auto_prettyDisable_when_playersNR
+			&& g_Players.length > auto_prettyDisable_when_playersNR){
+				g_isnitialIsSet_prettyDisable_prettyEnable = true
+				// selfMessage(`1093: ${g_Players.length}`) // this also counts Gaia
+				prettyGraphicsDisable()
+		}
+
+
+
 
 		// to check thats first moment and not already set to "ingame"
 		if(gameState != "ingame"
@@ -1213,9 +1364,15 @@ function FuzzySet(arr, useLevenshtein, gramSizeLower, gramSizeUpper)
 	fuzzyset.get = function(value, defaultValue, minMatchScore)
 	{
 		// check for value in set, returning defaultValue or null if none found
+
+
 		if (minMatchScore === undefined)
 		{
-			minMatchScore = 0.33;
+			// warn(` uuuuuuuuuuuuu ${g_minMatchScore})`);
+			if(g_minMatchScore)
+				minMatchScore = g_minMatchScore
+			else
+				minMatchScore = 0.33;
 		}
 		let result = this._get(value, minMatchScore);
 		if (!result && typeof defaultValue !== 'undefined')
@@ -1464,6 +1621,10 @@ function FuzzySet(arr, useLevenshtein, gramSizeLower, gramSizeUpper)
  *
  * @param {string} query - The query to search for.
  * @param {object} fuzzyArray - The fuzzy array to search in.
+ * @param {number} minMatchScore - The minimum similarity score to consider a match (default is 0.3).
+ * Higher minMatchScore: Setting a higher minMatchScore will make the function more selective.
+ * It will only return very strong matches.
+ * This can reduce the number of false positives but might also lead to the function returning null (no match) more often.
  * @return {object} An object containing the best match, the matched word, and the similarity score.
  */
 function findBestMatch(query, fuzzyArray, minMatchScore = 0.3) {
@@ -1475,8 +1636,11 @@ function findBestMatch(query, fuzzyArray, minMatchScore = 0.3) {
 
 	if(!query)
 		return ''
-	if(isDebug)
-		selfMessage(`findBestMatch for query "${query}"`);
+	if(isDebug){
+		selfMessage(`1605: autocivSharedCommands.js: findBestMatch`);
+		selfMessage(`1605: findBestMatch for query "${query}"`);
+		selfMessage(`1605: minMatchScore = ${minMatchScore}`);
+	}
 
 
 

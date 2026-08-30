@@ -1,11 +1,30 @@
-moddata/autociv_0ad_keys.txt
+# Daten / Konfiguration
+# moddata/autociv_0ad_keys.txt
 moddata/autociv_0ad_default.cfg
 /release.json
+
+# Archive
 *.zip
+
+# Ignore temporary files
 *tempList.text
-.vscode
+*~
+*.bak
+
+# Ignore Kate editor backup files
+*@auto
+*.kate-swp
+
+
+# IDE / Editor
+.vscode/
 error_unsolved.txt
-.vscode
-.git*
 
+.idea/
+.idea/**/*
 
+# Netlify
+.netlify/cache/
+
+# Ignoriere nur die Inhalte, nicht den Ordner selbst!
+# .netlify/functions/*

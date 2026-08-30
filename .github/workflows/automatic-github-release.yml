@@ -1,0 +1,129 @@
+# let the workflow clarify. the reasoning behind releasing the previous version.
+# The mod.json file in th main branch contains the next version.
+# it declares the next version that's under development,
+# and the workflow's purpose is to create a release for the code that represents the previous stable version.
+# This is an unusual but valid workflow.
+
+# This workflow automates the process of creating GitHub Releases when a new version
+# is detected in the `mod.json` file. It ensures that a release is created only if
+# the version number in `mod.json` has been incremented, and it generates release notes
+# based on the commits since the last release.
+
+# This workflow is triggered on pushes to the specified branches (e.g., master or main)
+# AND when the `mod.json` file is modified.  Both conditions must be met for the workflow
+# to run.
+
+name: Create GitHub Release
+
+on:
+  push:
+    paths:
+      - 'mod.json'
+    branches:
+      - master  # Or main, depending on your branch name
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # Important to fetch all tags
+
+      - name: Get Version from mod.json
+        id: get_version
+        run: |
+          VERSION=$(jq -r .version mod.json)
+          echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Calculate Release Version and Tag
+        id: calculate_release_version
+        run: |
+          VERSION="${{ steps.get_version.outputs.VERSION }}"
+
+          # Extract the parts of the version number
+          MAJOR=$(echo "$VERSION" | cut -d'.' -f1)
+          MINOR=$(echo "$VERSION" | cut -d'.' -f2)
+          PATCH=$(echo "$VERSION" | cut -d'.' -f3)
+
+          # Calculate the RELEASE version (one less than current version in mod.json)
+          if [[ "$PATCH" -gt 0 ]]; then
+            RELEASE_VERSION="$MAJOR.$MINOR.$((PATCH - 1))"
+          elif [[ "$MINOR" -gt 0 ]]; then
+            RELEASE_VERSION="$MAJOR.$((MINOR - 1)).99"  # Assuming 99 is the last patch version
+          elif [[ "$MAJOR" -gt 0 ]]; then
+            RELEASE_VERSION="$((MAJOR - 1)).99.99" # Assuming 99 is the last minor version
+          else
+            RELEASE_VERSION="0.0.0" # Or whatever makes sense for your project
+          fi
+
+          RELEASE_TAG="v$RELEASE_VERSION"
+
+          echo "RELEASE_VERSION=$RELEASE_VERSION" >> $GITHUB_OUTPUT
+          echo "RELEASE_TAG=$RELEASE_TAG" >> $GITHUB_OUTPUT
+
+      - name: Check if Tag Exists
+        id: check_tag_exists
+        run: |
+          RELEASE_TAG="${{ steps.calculate_release_version.outputs.RELEASE_TAG }}"
+          git fetch --tags
+          if git rev-parse --verify "refs/tags/$RELEASE_TAG" >/dev/null 2>&1; then
+            echo "TAG_EXISTS=true" >> $GITHUB_OUTPUT
+            echo "Tag $RELEASE_TAG already exists. Skipping release creation."
+          else
+            echo "TAG_EXISTS=false" >> $GITHUB_OUTPUT
+            echo "Tag $RELEASE_TAG does not exist. Proceeding with release creation."
+          fi
+
+      - name: Generate Release Notes
+        id: generate_release_notes
+        if: steps.check_tag_exists.outputs.TAG_EXISTS == 'false'
+        run: |
+          VERSION="${{ steps.get_version.outputs.VERSION }}"
+          RELEASE_TAG="${{ steps.calculate_release_version.outputs.RELEASE_TAG }}"
+
+          # Get a list of contributors for this release
+          CONTRIBUTORS=$(git log --pretty="%an" --since="$RELEASE_TAG" | sort -u | sed 's/^\(.*\)$/@\1/g' | xargs)
+
+          # Generate the commit list, explicitly handling the first release case
+          if [[ "$(git describe --abbrev=0 --tags 2>/dev/null)" ]]; then
+            RELEASE_NOTES=$(git log --pretty=format:"- %s" $(git describe --abbrev=0 --tags)..HEAD)
+          else
+            # No tags exist yet, so grab ALL commits
+            RELEASE_NOTES=$(git log --pretty=format:"- %s" $(git rev-list --max-parents=0 HEAD)..HEAD)
+          fi
+
+          # Construct the full release notes
+          INTRO="Release notes for version $RELEASE_TAG.\n"
+          if [[ -n "$CONTRIBUTORS" ]]; then
+            INTRO="$INTRO Contributors: $CONTRIBUTORS\n"
+          fi
+
+          DOWNLOAD_LINK="Download Link: https://autocivp.netlify.app/download/latest.zip\n"
+          FULL_RELEASE_NOTES="$INTRO$DOWNLOAD_LINK$RELEASE_NOTES"
+
+          # Output the release notes
+          echo "RELEASE_NOTES<<EOF" >> $GITHUB_OUTPUT
+          echo -e "$FULL_RELEASE_NOTES" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Create Release
+        uses: actions/create-release@v1
+        if: steps.check_tag_exists.outputs.TAG_EXISTS == 'false'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.calculate_release_version.outputs.RELEASE_TAG }}
+          release_name: Release ${{ steps.calculate_release_version.outputs.RELEASE_TAG }}
+          body: ${{ steps.generate_release_notes.outputs.RELEASE_NOTES }}
+          draft: false
+          prerelease: false
+
+      - name: Create Tag (if it doesn't exist)
+        if: steps.check_tag_exists.outputs.TAG_EXISTS == 'false'
+        run: |
+          VERSION="${{ steps.get_version.outputs.VERSION }}"
+          RELEASE_TAG="${{ steps.calculate_release_version.outputs.RELEASE_TAG }}"
+          git tag $RELEASE_TAG
+          git push origin $RELEASE_TAG
+          echo "Created tag $RELEASE_TAG"
